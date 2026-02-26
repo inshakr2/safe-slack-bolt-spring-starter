@@ -9,7 +9,23 @@ ext {
     slackBoltVersion = '1.45.3'
     springBootVersion = '2.7.18'
     publishableModules = ['slack-bolt-socket-mode-core', 'slack-bolt-socket-mode-spring-boot-starter'] as Set
-    releasePropertyNames = ['sonatypeUsername', 'sonatypePassword', 'signingKeyId', 'signingKey', 'signingPassword']
+    releasePropertyNames = ['sonatypeUsername', 'sonatypePassword', 'signingKey', 'signingPassword']
+    normalizePgpSecretKey = { String rawKey ->
+        if (rawKey == null) {
+            return null
+        }
+        String normalized = rawKey
+                .replace('\r\n', '\n')
+                .replace('\\n', '\n')
+                .trim()
+        if (normalized.isEmpty()) {
+            return null
+        }
+        if (!normalized.endsWith('\n')) {
+            normalized = normalized + '\n'
+        }
+        return normalized
+    }
 }
 
 tasks.register('validateReleaseCredentials') {
@@ -27,6 +43,18 @@ tasks.register('validateReleaseCredentials') {
         }
         if (!missing.isEmpty()) {
             throw new GradleException("Missing required Gradle properties for release: ${missing.join(', ')}")
+        }
+
+        def normalizedSigningKey = rootProject.ext.normalizePgpSecretKey(providers.gradleProperty('signingKey').orNull)
+        if (normalizedSigningKey == null) {
+            throw new GradleException('signingKey must not be blank')
+        }
+        if (normalizedSigningKey.contains('BEGIN PGP PUBLIC KEY BLOCK')) {
+            throw new GradleException('signingKey appears to be a public key. Use: gpg --armor --export-secret-keys <KEY_ID>')
+        }
+        if (!normalizedSigningKey.contains('BEGIN PGP PRIVATE KEY BLOCK')
+                || !normalizedSigningKey.contains('END PGP PRIVATE KEY BLOCK')) {
+            throw new GradleException('signingKey must contain an ASCII-armored private key block')
         }
     }
 }
@@ -134,11 +162,10 @@ subprojects {
                 }
             }
             if (!signingSkip) {
-                def keyId = providers.gradleProperty('signingKeyId').orNull
-                def key = providers.gradleProperty('signingKey').orNull
+                def key = rootProject.ext.normalizePgpSecretKey(providers.gradleProperty('signingKey').orNull)
                 def password = providers.gradleProperty('signingPassword').orNull
                 if (key != null && password != null) {
-                    useInMemoryPgpKeys(keyId, key, password)
+                    useInMemoryPgpKeys(key, password)
                 }
                 sign(publishing.publications.mavenJava)
             }

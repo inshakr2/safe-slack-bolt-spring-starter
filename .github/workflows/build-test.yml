@@ -3,6 +3,7 @@ name: Build and Test
 on:
   push:
     branches:
+      - release
       - prod
       - develop
       - "feature/**"
@@ -10,6 +11,7 @@ on:
       - "hotfix/**"
   pull_request:
     branches:
+      - release
       - prod
       - develop
 

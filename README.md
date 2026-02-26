@@ -139,7 +139,8 @@ public class SampleShortcutHandler extends AbstractGlobalShortcutHandler {
 
 ## 릴리즈
 GitFlow 전략을 사용합니다.
-- `prod`: 배포 기준 브랜치 (태그 생성/실배포 기준)
+- `release`: 배포 기준 브랜치 (태그 생성/실배포 기준)
+- `prod`: 운영 기준 보호 브랜치
 - `develop`: 통합 개발 브랜치
 - `feature/*`, `release/*`, `hotfix/*`: 작업 브랜치
 
@@ -149,12 +150,12 @@ GitFlow 전략을 사용합니다.
 ```
 
 ### Real release (Maven Central)
-`prod` 최신 커밋에 `v*` 태그를 push하면 [release-publish.yml](./.github/workflows/release-publish.yml) 워크플로가 실행됩니다.
+`release` 최신 커밋에 `v*` 태그를 push하면 [release-publish.yml](./.github/workflows/release-publish.yml) 워크플로가 실행됩니다.
 
 최초 릴리즈 예시:
 ```bash
-git checkout prod
-git pull origin prod
+git checkout release
+git pull origin release
 git tag v1.0.0
 git push origin v1.0.0
 ```
@@ -164,7 +165,7 @@ git push origin v1.0.0
 - Secrets
   - `SONATYPE_USERNAME`
   - `SONATYPE_PASSWORD`
-  - `GPG_SIGNING_KEY_ID`
+  - `GPG_SIGNING_KEY_ID` (optional)
   - `GPG_SIGNING_KEY`
   - `GPG_SIGNING_PASSWORD`
 
@@ -176,7 +177,7 @@ git push origin v1.0.0
 - `.github/workflows/publish-dry-run.yml`
   - `workflow_dispatch`에서 로컬 퍼블리시 드라이런 수행
 - `.github/workflows/release-publish.yml`
-  - `prod` HEAD에 생성된 `v*` 태그 push 시 승인 게이트 후 Maven Central 실배포 수행
+  - `release` HEAD에 생성된 `v*` 태그 push 시 승인 게이트 후 Maven Central 실배포 수행
 
 ## 보안 주의
 - 실제 Slack 토큰은 저장소에 커밋하지 마세요.

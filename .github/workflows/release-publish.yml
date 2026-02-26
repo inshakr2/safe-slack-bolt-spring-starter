@@ -24,15 +24,15 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Verify tag commit is prod HEAD
+      - name: Verify tag commit is release HEAD
         run: |
-          git fetch origin prod --depth=1
+          git fetch origin release --depth=1
           TAG_COMMIT=$(git rev-list -n 1 "${GITHUB_REF}")
-          PROD_COMMIT=$(git rev-parse origin/prod)
+          RELEASE_COMMIT=$(git rev-parse origin/release)
           echo "Tag commit: ${TAG_COMMIT}"
-          echo "prod HEAD: ${PROD_COMMIT}"
-          if [ "${TAG_COMMIT}" != "${PROD_COMMIT}" ]; then
-            echo "::error::Release tags must be created from the latest prod HEAD."
+          echo "release HEAD: ${RELEASE_COMMIT}"
+          if [ "${TAG_COMMIT}" != "${RELEASE_COMMIT}" ]; then
+            echo "::error::Release tags must be created from the latest release HEAD."
             exit 1
           fi
 

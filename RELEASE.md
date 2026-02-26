@@ -12,7 +12,7 @@
 ## 2) GPG 키 준비
 1. 배포용 GPG 키를 생성합니다.
 2. 아래 값을 확보합니다.
-- `GPG_SIGNING_KEY_ID`
+- `GPG_SIGNING_KEY_ID` (optional)
 - `GPG_SIGNING_KEY` (ASCII-armored private key)
 - `GPG_SIGNING_PASSWORD`
 
@@ -22,14 +22,15 @@
 3. `release` 환경 Secrets 등록
 - `SONATYPE_USERNAME`
 - `SONATYPE_PASSWORD`
-- `GPG_SIGNING_KEY_ID`
+- `GPG_SIGNING_KEY_ID` (optional)
 - `GPG_SIGNING_KEY`
 - `GPG_SIGNING_PASSWORD`
 
 ## 4) 워크플로
 
-브랜치 전략은 GitFlow(`prod`, `develop`)를 기준으로 운영합니다.
-- `prod`: 실배포 기준 브랜치
+브랜치 전략은 GitFlow(`release`, `prod`, `develop`)를 기준으로 운영합니다.
+- `release`: 실배포 기준 브랜치
+- `prod`: 운영 기준 보호 브랜치
 - `develop`: 통합 개발 브랜치
 
 ### Dry-run
@@ -39,15 +40,15 @@
 ```
 
 ### Real release
-1. `prod` 최신 상태에서 태그 생성
+1. `release` 최신 상태에서 태그 생성
 ```bash
-git checkout prod
-git pull origin prod
+git checkout release
+git pull origin release
 git tag v1.0.0
 git push origin v1.0.0
 ```
 2. GitHub Actions `Release Publish` 워크플로 자동 실행
-   - 워크플로에서 태그 커밋이 `prod` HEAD인지 검증하며, 불일치 시 실패합니다.
+   - 워크플로에서 태그 커밋이 `release` HEAD인지 검증하며, 불일치 시 실패합니다.
 3. `publish` job은 `release` 환경 승인 후 진행
 4. 실행 명령
 ```bash
