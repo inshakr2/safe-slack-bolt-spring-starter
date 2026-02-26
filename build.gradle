@@ -8,7 +8,7 @@ version = '1.0.0'
 ext {
     slackBoltVersion = '1.45.3'
     springBootVersion = '2.7.18'
-    publishableModules = ['safe-slack-bolt-core', 'safe-slack-bolt-spring-boot-starter'] as Set
+    publishableModules = ['slack-bolt-socket-mode-core', 'slack-bolt-socket-mode-spring-boot-starter'] as Set
     releasePropertyNames = ['sonatypeUsername', 'sonatypePassword', 'signingKeyId', 'signingKey', 'signingPassword']
 }
 
@@ -95,8 +95,8 @@ subprojects {
 
                     pom {
                         name = project.name
-                        description = 'Safe Slack Bolt handlers and Spring Boot starter'
-                        url = 'https://github.com/inshakr2/safe-slack-bolt-spring-starter'
+                        description = 'Slack Bolt Socket Mode handlers and Spring Boot starter'
+                        url = 'https://github.com/inshakr2/slack-bolt-socket-mode-spring-boot-starter'
 
                         licenses {
                             license {
@@ -113,9 +113,9 @@ subprojects {
                         }
 
                         scm {
-                            connection = 'scm:git:https://github.com/inshakr2/safe-slack-bolt-spring-starter.git'
-                            developerConnection = 'scm:git:https://github.com/inshakr2/safe-slack-bolt-spring-starter.git'
-                            url = 'https://github.com/inshakr2/safe-slack-bolt-spring-starter'
+                            connection = 'scm:git:https://github.com/inshakr2/slack-bolt-socket-mode-spring-boot-starter.git'
+                            developerConnection = 'scm:git:https://github.com/inshakr2/slack-bolt-socket-mode-spring-boot-starter.git'
+                            url = 'https://github.com/inshakr2/slack-bolt-socket-mode-spring-boot-starter'
                         }
                     }
                 }

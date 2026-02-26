@@ -1,0 +1,13 @@
+dependencies {
+    implementation project(':slack-bolt-socket-mode-spring-boot-starter')
+    implementation "org.springframework.boot:spring-boot-starter:${rootProject.ext.springBootVersion}"
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${rootProject.ext.springBootVersion}"
+}
+
+// Sample module is for local/manual usage only and is excluded from Central publishing.
+tasks.matching { task ->
+    task.name.startsWith('publish') || task.name.startsWith('sign')
+}.configureEach {
+    enabled = false
+}

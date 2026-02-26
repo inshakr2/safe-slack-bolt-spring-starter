@@ -1,0 +1,55 @@
+{
+  "display_information": {
+    "name": "Slack Bolt Socket Mode Sample"
+  },
+  "features": {
+    "app_home": {
+      "home_tab_enabled": true,
+      "messages_tab_enabled": false,
+      "messages_tab_read_only_enabled": true
+    },
+    "bot_user": {
+      "display_name": "Socket Mode Bolt"
+    },
+    "shortcuts": [
+      {
+        "name": "Run sample global shortcut",
+        "type": "global",
+        "callback_id": "sample-global-shortcut",
+        "description": "Runs sample global shortcut handler"
+      }
+    ],
+    "slash_commands": [
+      {
+        "command": "/socket-mode-hello",
+        "description": "Run socket mode command sample",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "app_mentions:read",
+        "channels:history",
+        "chat:write",
+        "commands",
+        "im:history"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "bot_events": [
+        "app_home_opened",
+        "message.channels"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": true
+    },
+    "socket_mode_enabled": true,
+    "org_deploy_enabled": false,
+    "token_rotation_enabled": false
+  }
+}

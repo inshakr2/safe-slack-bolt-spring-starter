@@ -1,5 +1,5 @@
-rootProject.name = 'safe-slack-bolt-spring-starter'
+rootProject.name = 'slack-bolt-socket-mode-spring-boot-starter'
 
-include 'safe-slack-bolt-core'
-include 'safe-slack-bolt-spring-boot-starter'
-include 'safe-slack-bolt-sample'
+include 'slack-bolt-socket-mode-core'
+include 'slack-bolt-socket-mode-spring-boot-starter'
+include 'slack-bolt-socket-mode-sample'

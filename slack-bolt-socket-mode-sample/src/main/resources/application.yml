@@ -1,0 +1,8 @@
+slack:
+  bolt:
+    socket-mode:
+      enabled: ${SLACK_BOLT_SOCKET_MODE_ENABLED:false}
+      bot-token: ${SLACK_BOT_TOKEN:}
+      app-token: ${SLACK_APP_TOKEN:}
+      socket-mode-enabled: ${SLACK_BOLT_SOCKET_MODE_SOCKET_MODE_ENABLED:false}
+      socket-mode-auto-startup: ${SLACK_BOLT_SOCKET_MODE_AUTO_STARTUP:false}
