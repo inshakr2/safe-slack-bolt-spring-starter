@@ -7,6 +7,7 @@ import io.github.inshakr2.safeslackbolt.starter.registry.HandlerRegistryValidato
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.util.ClassUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -73,6 +74,20 @@ class SafeSlackBoltAutoConfigurationTest {
                     // Then
                     assertThat(context).hasSingleBean(SocketModeLifecycle.class);
                 });
+    }
+
+    @Test
+    void containsSocketModeRuntimeDependencies() {
+        // Given
+        ClassLoader classLoader = SafeSlackBoltAutoConfigurationTest.class.getClassLoader();
+
+        // When
+        boolean hasJavaxWebSocketApi = ClassUtils.isPresent("javax.websocket.DeploymentException", classLoader);
+        boolean hasTyrusClient = ClassUtils.isPresent("org.glassfish.tyrus.client.ClientManager", classLoader);
+
+        // Then
+        assertThat(hasJavaxWebSocketApi).isTrue();
+        assertThat(hasTyrusClient).isTrue();
     }
 
     private static final class RecordingHandler implements SafeBoltHandler {

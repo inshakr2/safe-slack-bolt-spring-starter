@@ -1,6 +1,8 @@
 dependencies {
     api project(':safe-slack-bolt-core')
     api "org.springframework.boot:spring-boot-autoconfigure:${rootProject.ext.springBootVersion}"
+    api "javax.websocket:javax.websocket-api:1.1"
+    runtimeOnly "org.glassfish.tyrus.bundles:tyrus-standalone-client:1.19"
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${rootProject.ext.springBootVersion}"
 
