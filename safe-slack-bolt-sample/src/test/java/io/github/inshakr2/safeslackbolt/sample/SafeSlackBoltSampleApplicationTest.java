@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,6 +30,8 @@ class SafeSlackBoltSampleApplicationTest {
         Map<String, SafeBoltHandler> handlers = applicationContext.getBeansOfType(SafeBoltHandler.class);
 
         // Then
-        assertThat(handlers).hasSize(3);
+        assertThat(handlers).hasSize(6);
+        assertThat(handlers.values().stream().map(SafeBoltHandler::getIdentifier).collect(Collectors.toSet()))
+                .hasSize(6);
     }
 }

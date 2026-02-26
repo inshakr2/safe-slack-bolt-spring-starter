@@ -10,6 +10,10 @@
 | `com.brobotics.core.infrastructure.bolt.SafeCommandHandler` | `io.github.inshakr2.safeslackbolt.core.handler.command.AbstractSafeCommandHandler` |
 | `com.brobotics.core.infrastructure.bolt.SafeBlockActionHandler` | `io.github.inshakr2.safeslackbolt.core.handler.action.AbstractSafeBlockActionHandler` |
 | `com.brobotics.core.infrastructure.bolt.SafeViewSubmissionHandler` | `io.github.inshakr2.safeslackbolt.core.handler.view.AbstractSafeViewSubmissionHandler` |
+| (신규) Message Event 핸들러 | `io.github.inshakr2.safeslackbolt.core.handler.event.AbstractSafeMessageEventHandler` |
+| (신규) App Home Opened 이벤트 핸들러 | `io.github.inshakr2.safeslackbolt.core.handler.event.AbstractSafeAppHomeOpenedEventHandler` |
+| (신규) Global Shortcut 핸들러 | `io.github.inshakr2.safeslackbolt.core.handler.shortcut.AbstractSafeGlobalShortcutHandler` |
+| (신규) View validation error 유틸 | `io.github.inshakr2.safeslackbolt.core.handler.view.ViewSubmissionValidationErrors` |
 
 ## 2. 등록 방식 변경
 
@@ -52,3 +56,12 @@ safe:
 - 핸들러 identifier 중복 시 시작 단계 Fail-Fast
 - SocketMode 시작/종료 라이프사이클 객체 분리
 - 설정 누락(bot/app token) 시 명확한 예외 메시지 제공
+
+## 6. View Submission 검증 응답 처리
+- `ViewSubmissionValidationErrors` 유틸을 사용해 block 단위 에러를 누적하고 `ackWithErrors`로 응답할 수 있습니다.
+
+```java
+return ViewSubmissionValidationErrors.of("agenda_input", "필수 입력값입니다.")
+        .add("owner_input", "담당자를 선택하세요.")
+        .ack(ctx);
+```
