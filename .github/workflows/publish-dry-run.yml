@@ -1,10 +1,7 @@
-name: Publish Dry Run
+name: Publish Local Dry Run
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "v*"
 
 jobs:
   publish-dry-run:
@@ -23,5 +20,5 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Maven Local Publish Dry Run
+      - name: Maven Local Publish Dry Run Only
         run: ./gradlew clean publishToMavenLocal -Psigning.skip=true --no-daemon

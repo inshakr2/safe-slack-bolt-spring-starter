@@ -1,15 +1,53 @@
+plugins {
+    id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
+}
+
 group = 'io.github.inshakr2'
 version = '0.1.1'
 
 ext {
     slackBoltVersion = '1.45.3'
     springBootVersion = '2.7.18'
+    publishableModules = ['safe-slack-bolt-core', 'safe-slack-bolt-spring-boot-starter'] as Set
+    releasePropertyNames = ['sonatypeUsername', 'sonatypePassword', 'signingKeyId', 'signingKey', 'signingPassword']
+}
+
+tasks.register('validateReleaseCredentials') {
+    group = 'publishing'
+    description = 'Validates required Sonatype/GPG properties for release publishing.'
+    doLast {
+        def signingSkip = providers.gradleProperty('signing.skip').map { it.toBoolean() }.orElse(false).get()
+        if (signingSkip) {
+            logger.lifecycle('Skipping release credential validation because signing.skip=true')
+            return
+        }
+
+        def missing = rootProject.ext.releasePropertyNames.findAll { key ->
+            !providers.gradleProperty(key).isPresent() || providers.gradleProperty(key).get().trim().isEmpty()
+        }
+        if (!missing.isEmpty()) {
+            throw new GradleException("Missing required Gradle properties for release: ${missing.join(', ')}")
+        }
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl = uri('https://ossrh-staging-api.central.sonatype.com/service/local/')
+            snapshotRepositoryUrl = uri('https://central.sonatype.com/repository/maven-snapshots/')
+            username = providers.gradleProperty('sonatypeUsername').orNull
+            password = providers.gradleProperty('sonatypePassword').orNull
+        }
+    }
+}
+
+tasks.matching { it.name in ['publishToSonatype', 'closeAndReleaseSonatypeStagingRepository'] }.configureEach {
+    dependsOn(tasks.named('validateReleaseCredentials'))
 }
 
 subprojects {
     apply plugin: 'java-library'
-    apply plugin: 'maven-publish'
-    apply plugin: 'signing'
 
     group = rootProject.group
     version = rootProject.version
@@ -43,52 +81,67 @@ subprojects {
         testImplementation 'org.mockito:mockito-inline:5.2.0'
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
-                groupId = project.group
-                artifactId = project.name
-                version = project.version
+    if (project.name in rootProject.ext.publishableModules) {
+        apply plugin: 'maven-publish'
+        apply plugin: 'signing'
 
-                pom {
-                    name = project.name
-                    description = 'Safe Slack Bolt handlers and Spring Boot starter'
-                    url = 'https://github.com/inshakr2/safe-slack-bolt-spring-starter'
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    from components.java
+                    groupId = project.group
+                    artifactId = project.name
+                    version = project.version
 
-                    licenses {
-                        license {
-                            name = 'Apache License, Version 2.0'
-                            url = 'https://www.apache.org/licenses/LICENSE-2.0'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id = 'inshakr2'
-                            name = 'inshakr2'
-                        }
-                    }
-
-                    scm {
-                        connection = 'scm:git:https://github.com/inshakr2/safe-slack-bolt-spring-starter.git'
-                        developerConnection = 'scm:git:https://github.com/inshakr2/safe-slack-bolt-spring-starter.git'
+                    pom {
+                        name = project.name
+                        description = 'Safe Slack Bolt handlers and Spring Boot starter'
                         url = 'https://github.com/inshakr2/safe-slack-bolt-spring-starter'
+
+                        licenses {
+                            license {
+                                name = 'Apache License, Version 2.0'
+                                url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id = 'inshakr2'
+                                name = 'inshakr2'
+                            }
+                        }
+
+                        scm {
+                            connection = 'scm:git:https://github.com/inshakr2/safe-slack-bolt-spring-starter.git'
+                            developerConnection = 'scm:git:https://github.com/inshakr2/safe-slack-bolt-spring-starter.git'
+                            url = 'https://github.com/inshakr2/safe-slack-bolt-spring-starter'
+                        }
                     }
                 }
             }
+
+            repositories {
+                mavenLocal()
+            }
         }
 
-        repositories {
-            mavenLocal()
-        }
-    }
-
-    signing {
-        def signingSkip = providers.gradleProperty('signing.skip').map { it.toBoolean() }.orElse(false).get()
-        required { !signingSkip && gradle.taskGraph.allTasks.any { it.name.startsWith('publish') } }
-        if (!signingSkip) {
-            sign publishing.publications.mavenJava
+        signing {
+            def signingSkip = providers.gradleProperty('signing.skip').map { it.toBoolean() }.orElse(false).get()
+            required {
+                !signingSkip && gradle.taskGraph.allTasks.any { task ->
+                    task.name.startsWith('publish') || task.name.contains('Sonatype')
+                }
+            }
+            if (!signingSkip) {
+                def keyId = providers.gradleProperty('signingKeyId').orNull
+                def key = providers.gradleProperty('signingKey').orNull
+                def password = providers.gradleProperty('signingPassword').orNull
+                if (key != null && password != null) {
+                    useInMemoryPgpKeys(keyId, key, password)
+                }
+                sign(publishing.publications.mavenJava)
+            }
         }
     }
 }

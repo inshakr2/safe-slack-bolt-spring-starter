@@ -13,6 +13,10 @@ Slack Bolt Java 기반 인터랙션 핸들러를 안전하게 공통화하고, S
   - `AbstractSafeCommandHandler`
   - `AbstractSafeBlockActionHandler`
   - `AbstractSafeViewSubmissionHandler`
+  - `AbstractSafeMessageEventHandler`
+  - `AbstractSafeAppHomeOpenedEventHandler`
+  - `AbstractSafeGlobalShortcutHandler`
+  - `ViewSubmissionValidationErrors`
 - `safe-slack-bolt-spring-boot-starter`
   - `SafeSlackBoltAutoConfiguration`
   - `SafeSlackBoltProperties`
@@ -20,6 +24,7 @@ Slack Bolt Java 기반 인터랙션 핸들러를 안전하게 공통화하고, S
   - `SocketModeLifecycle`
 - `safe-slack-bolt-sample`
   - starter 사용 예제 애플리케이션
+  - Maven Central 배포 대상 아님
 
 ## 요구사항
 - Java 11+
@@ -108,6 +113,21 @@ public class HelloCommandHandler extends AbstractSafeCommandHandler {
 }
 ```
 
+```java
+@Component
+public class SampleShortcutHandler extends AbstractSafeGlobalShortcutHandler {
+    @Override
+    protected String getCallbackId() {
+        return "sample-global-shortcut";
+    }
+
+    @Override
+    protected Response handle(GlobalShortcutRequest req, GlobalShortcutContext ctx) {
+        return ctx.ack();
+    }
+}
+```
+
 - 모든 핸들러는 `SafeBoltHandler` 계약으로 자동 수집됩니다.
 - 동일 `identifier`가 중복되면 앱 시작 시 즉시 실패합니다.
 
@@ -117,16 +137,39 @@ public class HelloCommandHandler extends AbstractSafeCommandHandler {
 ./gradlew publishToMavenLocal -Psigning.skip=true
 ```
 
+## 릴리즈
+
+### Dry-run (로컬 퍼블리시만)
+```bash
+./gradlew clean publishToMavenLocal -Psigning.skip=true
+```
+
+### Real release (Maven Central)
+`v*` 태그 push 시 [release-publish.yml](./.github/workflows/release-publish.yml) 워크플로가 실행됩니다.
+
+필수 조건:
+- GitHub Environment: `release`
+- Secrets
+  - `SONATYPE_USERNAME`
+  - `SONATYPE_PASSWORD`
+  - `GPG_SIGNING_KEY_ID`
+  - `GPG_SIGNING_KEY`
+  - `GPG_SIGNING_PASSWORD`
+
+자세한 절차는 [RELEASE.md](./RELEASE.md)를 참고하세요.
+
 ## CI
 - `.github/workflows/build-test.yml`
   - push/PR 시 전체 모듈 빌드/테스트
 - `.github/workflows/publish-dry-run.yml`
-  - `workflow_dispatch`, `v*` 태그에서 로컬 퍼블리시 드라이런 수행
+  - `workflow_dispatch`에서 로컬 퍼블리시 드라이런 수행
+- `.github/workflows/release-publish.yml`
+  - `v*` 태그 push 시 승인 게이트 후 Maven Central 실배포 수행
 
 ## 보안 주의
 - 실제 Slack 토큰은 저장소에 커밋하지 마세요.
 - CI 비밀값(`secrets`) 또는 런타임 환경변수만 사용하세요.
 
 ## 배포 로드맵
-- 현재 단계: First Commit + dry-run
-- 다음 단계: GPG/Portal 자격증명 구성 후 Maven Central 정식 배포
+- 현재 단계: Phase 2/3 구현 진행
+- 릴리즈 기준 버전: `0.1.1`
