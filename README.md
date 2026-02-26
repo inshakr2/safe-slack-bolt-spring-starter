@@ -30,8 +30,8 @@ Slack Bolt Java 기반 인터랙션 핸들러를 안전하게 공통화하고, S
 ### Gradle
 ```gradle
 dependencies {
-    implementation "io.github.inshakr2:safe-slack-bolt-core:0.1.0-SNAPSHOT"
-    implementation "io.github.inshakr2:safe-slack-bolt-spring-boot-starter:0.1.0-SNAPSHOT"
+    implementation "io.github.inshakr2:safe-slack-bolt-core:0.1.1"
+    implementation "io.github.inshakr2:safe-slack-bolt-spring-boot-starter:0.1.1"
 }
 ```
 
@@ -41,14 +41,29 @@ dependencies {
   <dependency>
     <groupId>io.github.inshakr2</groupId>
     <artifactId>safe-slack-bolt-core</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.1</version>
   </dependency>
   <dependency>
     <groupId>io.github.inshakr2</groupId>
     <artifactId>safe-slack-bolt-spring-boot-starter</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.1</version>
   </dependency>
 </dependencies>
+```
+
+## Slack App 생성 (Manifest)
+
+Slack 공식 템플릿의 온보딩 방식을 벤치마킹해 샘플 매니페스트를 제공합니다.
+
+1. Slack App 생성 화면에서 **From an app manifest** 선택
+2. [safe-slack-bolt-sample/manifest.json](./safe-slack-bolt-sample/manifest.json) 내용 붙여넣기
+3. 앱 생성 후 Bot Token / App Token 발급
+
+환경 변수:
+
+```bash
+export SLACK_BOT_TOKEN=xoxb-...
+export SLACK_APP_TOKEN=xapp-...
 ```
 
 ## 설정
@@ -61,6 +76,8 @@ dependencies {
 | `safe.slack.bolt.socket-mode-enabled` | N | `true` | Socket Mode 사용 여부 |
 | `safe.slack.bolt.app-token` | Y (`socket-mode-enabled=true`) | - | Slack app token |
 | `safe.slack.bolt.socket-mode-auto-startup` | N | `true` | 앱 시작 시 Socket Mode 자동 시작 여부 |
+
+`0.1.1`부터 starter가 Socket Mode 필수 런타임(`javax.websocket-api`, `tyrus-standalone-client`)을 기본 제공합니다.
 
 예시:
 ```yaml

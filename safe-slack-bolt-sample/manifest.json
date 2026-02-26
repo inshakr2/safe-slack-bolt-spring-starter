@@ -1,0 +1,33 @@
+{
+  "display_information": {
+    "name": "Safe Slack Bolt Sample"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "Safe Slack Bolt"
+    },
+    "slash_commands": [
+      {
+        "command": "/safe-hello",
+        "description": "Run safe command sample",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "commands",
+        "chat:write"
+      ]
+    }
+  },
+  "settings": {
+    "interactivity": {
+      "is_enabled": true
+    },
+    "socket_mode_enabled": true,
+    "org_deploy_enabled": false,
+    "token_rotation_enabled": false
+  }
+}

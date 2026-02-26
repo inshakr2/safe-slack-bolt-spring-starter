@@ -1,5 +1,5 @@
 group = 'io.github.inshakr2'
-version = '0.1.0-SNAPSHOT'
+version = '0.1.1'
 
 ext {
     slackBoltVersion = '1.45.3'
