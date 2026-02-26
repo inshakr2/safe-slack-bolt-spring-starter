@@ -28,6 +28,10 @@
 
 ## 4) 워크플로
 
+브랜치 전략은 GitFlow(`prod`, `develop`)를 기준으로 운영합니다.
+- `prod`: 실배포 기준 브랜치
+- `develop`: 통합 개발 브랜치
+
 ### Dry-run
 로컬/CI에서 아래 명령으로 서명 없이 로컬 퍼블리시만 검증합니다.
 ```bash
@@ -35,12 +39,15 @@
 ```
 
 ### Real release
-1. `main` 최신 상태에서 태그 생성
+1. `prod` 최신 상태에서 태그 생성
 ```bash
-git tag v0.1.1
-git push origin v0.1.1
+git checkout prod
+git pull origin prod
+git tag v1.0.0
+git push origin v1.0.0
 ```
 2. GitHub Actions `Release Publish` 워크플로 자동 실행
+   - 워크플로에서 태그 커밋이 `prod` HEAD인지 검증하며, 불일치 시 실패합니다.
 3. `publish` job은 `release` 환경 승인 후 진행
 4. 실행 명령
 ```bash

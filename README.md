@@ -35,8 +35,8 @@ Slack Bolt Java 기반 인터랙션 핸들러를 안전하게 공통화하고, S
 ### Gradle
 ```gradle
 dependencies {
-    implementation "io.github.inshakr2:safe-slack-bolt-core:0.1.1"
-    implementation "io.github.inshakr2:safe-slack-bolt-spring-boot-starter:0.1.1"
+    implementation "io.github.inshakr2:safe-slack-bolt-core:1.0.0"
+    implementation "io.github.inshakr2:safe-slack-bolt-spring-boot-starter:1.0.0"
 }
 ```
 
@@ -46,12 +46,12 @@ dependencies {
   <dependency>
     <groupId>io.github.inshakr2</groupId>
     <artifactId>safe-slack-bolt-core</artifactId>
-    <version>0.1.1</version>
+    <version>1.0.0</version>
   </dependency>
   <dependency>
     <groupId>io.github.inshakr2</groupId>
     <artifactId>safe-slack-bolt-spring-boot-starter</artifactId>
-    <version>0.1.1</version>
+    <version>1.0.0</version>
   </dependency>
 </dependencies>
 ```
@@ -82,7 +82,7 @@ export SLACK_APP_TOKEN=xapp-...
 | `safe.slack.bolt.app-token` | Y (`socket-mode-enabled=true`) | - | Slack app token |
 | `safe.slack.bolt.socket-mode-auto-startup` | N | `true` | 앱 시작 시 Socket Mode 자동 시작 여부 |
 
-`0.1.1`부터 starter가 Socket Mode 필수 런타임(`javax.websocket-api`, `tyrus-standalone-client`)을 기본 제공합니다.
+`1.0.0`부터 starter가 Socket Mode 필수 런타임(`javax.websocket-api`, `tyrus-standalone-client`)을 기본 제공합니다.
 
 예시:
 ```yaml
@@ -139,13 +139,26 @@ public class SampleShortcutHandler extends AbstractSafeGlobalShortcutHandler {
 
 ## 릴리즈
 
+GitFlow 전략을 사용합니다.
+- `prod`: 배포 기준 브랜치 (태그 생성/실배포 기준)
+- `develop`: 통합 개발 브랜치
+- `feature/*`, `release/*`, `hotfix/*`: 작업 브랜치
+
 ### Dry-run (로컬 퍼블리시만)
 ```bash
 ./gradlew clean publishToMavenLocal -Psigning.skip=true
 ```
 
 ### Real release (Maven Central)
-`v*` 태그 push 시 [release-publish.yml](./.github/workflows/release-publish.yml) 워크플로가 실행됩니다.
+`prod` 최신 커밋에 `v*` 태그를 push하면 [release-publish.yml](./.github/workflows/release-publish.yml) 워크플로가 실행됩니다.
+
+최초 릴리즈 예시:
+```bash
+git checkout prod
+git pull origin prod
+git tag v1.0.0
+git push origin v1.0.0
+```
 
 필수 조건:
 - GitHub Environment: `release`
@@ -164,7 +177,7 @@ public class SampleShortcutHandler extends AbstractSafeGlobalShortcutHandler {
 - `.github/workflows/publish-dry-run.yml`
   - `workflow_dispatch`에서 로컬 퍼블리시 드라이런 수행
 - `.github/workflows/release-publish.yml`
-  - `v*` 태그 push 시 승인 게이트 후 Maven Central 실배포 수행
+  - `prod` HEAD에 생성된 `v*` 태그 push 시 승인 게이트 후 Maven Central 실배포 수행
 
 ## 보안 주의
 - 실제 Slack 토큰은 저장소에 커밋하지 마세요.
@@ -172,4 +185,4 @@ public class SampleShortcutHandler extends AbstractSafeGlobalShortcutHandler {
 
 ## 배포 로드맵
 - 현재 단계: Phase 2/3 구현 진행
-- 릴리즈 기준 버전: `0.1.1`
+- 릴리즈 기준 버전: `1.0.0`
