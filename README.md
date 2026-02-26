@@ -1,29 +1,31 @@
-# safe-slack-bolt-spring-starter
+# slack-bolt-socket-mode-spring-boot-starter
 
-Slack Bolt Java 기반 인터랙션 핸들러를 안전하게 공통화하고, Spring Boot에서 자동 등록할 수 있도록 제공하는 라이브러리입니다.
+`v1.0.0`은 Slack **Socket Mode 전용** 라이브러리입니다.
+Slack Bolt Java 핸들러를 Spring Boot에서 일관되게 등록하고, 예외 발생 시 `ack fallback`으로 안전하게 응답하도록 공통화합니다.
 
-## 목표
-- Slack 핸들러 공통 예외 처리(`ack fallback`) 표준화
-- `instanceof` 체인 없이 `register(App app)` 계약으로 핸들러 등록 확장성 확보
-- Spring Boot 자동설정으로 Socket Mode 구동/종료 라이프사이클 제공
+## 핵심 기능
+- Socket Mode 기반 Slack Bolt 핸들러 등록 자동화
+- `register(App app)` 계약 기반 확장 가능한 핸들러 구조
+- 핸들러 실행 예외 시 공통 로깅 + `ctx.ack()` fallback 처리
+- 핸들러 식별자(`identifier`) 중복 검증 Fail-Fast
 
 ## 모듈
-- `safe-slack-bolt-core`
-  - `SafeBoltHandler`
-  - `AbstractSafeCommandHandler`
-  - `AbstractSafeBlockActionHandler`
-  - `AbstractSafeViewSubmissionHandler`
-  - `AbstractSafeMessageEventHandler`
-  - `AbstractSafeAppHomeOpenedEventHandler`
-  - `AbstractSafeGlobalShortcutHandler`
+- `slack-bolt-socket-mode-core`
+  - `BoltHandler`
+  - `AbstractCommandHandler`
+  - `AbstractBlockActionHandler`
+  - `AbstractViewSubmissionHandler`
+  - `AbstractMessageEventHandler`
+  - `AbstractAppHomeOpenedEventHandler`
+  - `AbstractGlobalShortcutHandler`
   - `ViewSubmissionValidationErrors`
-- `safe-slack-bolt-spring-boot-starter`
-  - `SafeSlackBoltAutoConfiguration`
-  - `SafeSlackBoltProperties`
+- `slack-bolt-socket-mode-spring-boot-starter`
+  - `SlackBoltSocketModeAutoConfiguration`
+  - `SlackBoltSocketModeProperties`
   - `HandlerRegistryValidator`
   - `SocketModeLifecycle`
-- `safe-slack-bolt-sample`
-  - starter 사용 예제 애플리케이션
+- `slack-bolt-socket-mode-sample`
+  - starter 사용 예제 앱
   - Maven Central 배포 대상 아님
 
 ## 요구사항
@@ -35,8 +37,8 @@ Slack Bolt Java 기반 인터랙션 핸들러를 안전하게 공통화하고, S
 ### Gradle
 ```gradle
 dependencies {
-    implementation "io.github.inshakr2:safe-slack-bolt-core:1.0.0"
-    implementation "io.github.inshakr2:safe-slack-bolt-spring-boot-starter:1.0.0"
+    implementation "io.github.inshakr2:slack-bolt-socket-mode-core:1.0.0"
+    implementation "io.github.inshakr2:slack-bolt-socket-mode-spring-boot-starter:1.0.0"
 }
 ```
 
@@ -45,50 +47,48 @@ dependencies {
 <dependencies>
   <dependency>
     <groupId>io.github.inshakr2</groupId>
-    <artifactId>safe-slack-bolt-core</artifactId>
+    <artifactId>slack-bolt-socket-mode-core</artifactId>
     <version>1.0.0</version>
   </dependency>
   <dependency>
     <groupId>io.github.inshakr2</groupId>
-    <artifactId>safe-slack-bolt-spring-boot-starter</artifactId>
+    <artifactId>slack-bolt-socket-mode-spring-boot-starter</artifactId>
     <version>1.0.0</version>
   </dependency>
 </dependencies>
 ```
 
 ## Slack App 생성 (Manifest)
-
-Slack 공식 템플릿의 온보딩 방식을 벤치마킹해 샘플 매니페스트를 제공합니다.
+Slack에서 제공하는 샘플 템플릿 흐름을 참고해 매니페스트 기반 온보딩을 지원합니다.
 
 1. Slack App 생성 화면에서 **From an app manifest** 선택
-2. [safe-slack-bolt-sample/manifest.json](./safe-slack-bolt-sample/manifest.json) 내용 붙여넣기
-3. 앱 생성 후 Bot Token / App Token 발급
+2. [slack-bolt-socket-mode-sample/manifest.json](./slack-bolt-socket-mode-sample/manifest.json) 내용 붙여넣기
+3. Bot Token / App Token 발급
 
 환경 변수:
-
 ```bash
 export SLACK_BOT_TOKEN=xoxb-...
 export SLACK_APP_TOKEN=xapp-...
 ```
 
 ## 설정
-`safe.slack.bolt.*` 프로퍼티를 사용합니다.
+`slack.bolt.socket-mode.*` 프로퍼티를 사용합니다.
 
 | Key | Required | Default | Description |
 |---|---|---|---|
-| `safe.slack.bolt.enabled` | N | `true` | starter 활성화 여부 |
-| `safe.slack.bolt.bot-token` | Y (`enabled=true`) | - | Slack bot token |
-| `safe.slack.bolt.socket-mode-enabled` | N | `true` | Socket Mode 사용 여부 |
-| `safe.slack.bolt.app-token` | Y (`socket-mode-enabled=true`) | - | Slack app token |
-| `safe.slack.bolt.socket-mode-auto-startup` | N | `true` | 앱 시작 시 Socket Mode 자동 시작 여부 |
+| `slack.bolt.socket-mode.enabled` | N | `true` | starter 활성화 여부 |
+| `slack.bolt.socket-mode.bot-token` | Y (`enabled=true`) | - | Slack bot token |
+| `slack.bolt.socket-mode.socket-mode-enabled` | N | `true` | Socket Mode 사용 여부 |
+| `slack.bolt.socket-mode.app-token` | Y (`socket-mode-enabled=true`) | - | Slack app token |
+| `slack.bolt.socket-mode.socket-mode-auto-startup` | N | `true` | 앱 시작 시 Socket Mode 자동 시작 여부 |
 
 `1.0.0`부터 starter가 Socket Mode 필수 런타임(`javax.websocket-api`, `tyrus-standalone-client`)을 기본 제공합니다.
 
 예시:
 ```yaml
-safe:
-  slack:
-    bolt:
+slack:
+  bolt:
+    socket-mode:
       enabled: true
       bot-token: ${SLACK_BOT_TOKEN}
       app-token: ${SLACK_APP_TOKEN}
@@ -100,7 +100,7 @@ safe:
 
 ```java
 @Component
-public class HelloCommandHandler extends AbstractSafeCommandHandler {
+public class HelloCommandHandler extends AbstractCommandHandler {
     @Override
     protected String getCommand() {
         return "/hello";
@@ -115,7 +115,7 @@ public class HelloCommandHandler extends AbstractSafeCommandHandler {
 
 ```java
 @Component
-public class SampleShortcutHandler extends AbstractSafeGlobalShortcutHandler {
+public class SampleShortcutHandler extends AbstractGlobalShortcutHandler {
     @Override
     protected String getCallbackId() {
         return "sample-global-shortcut";
@@ -128,7 +128,7 @@ public class SampleShortcutHandler extends AbstractSafeGlobalShortcutHandler {
 }
 ```
 
-- 모든 핸들러는 `SafeBoltHandler` 계약으로 자동 수집됩니다.
+- 모든 핸들러는 `BoltHandler` 계약으로 자동 수집됩니다.
 - 동일 `identifier`가 중복되면 앱 시작 시 즉시 실패합니다.
 
 ## 로컬 검증
@@ -138,13 +138,12 @@ public class SampleShortcutHandler extends AbstractSafeGlobalShortcutHandler {
 ```
 
 ## 릴리즈
-
 GitFlow 전략을 사용합니다.
 - `prod`: 배포 기준 브랜치 (태그 생성/실배포 기준)
 - `develop`: 통합 개발 브랜치
 - `feature/*`, `release/*`, `hotfix/*`: 작업 브랜치
 
-### Dry-run (로컬 퍼블리시만)
+### Dry-run (로컬 퍼블리시)
 ```bash
 ./gradlew clean publishToMavenLocal -Psigning.skip=true
 ```
@@ -182,6 +181,11 @@ git push origin v1.0.0
 ## 보안 주의
 - 실제 Slack 토큰은 저장소에 커밋하지 마세요.
 - CI 비밀값(`secrets`) 또는 런타임 환경변수만 사용하세요.
+
+## 상표 고지
+- `Spring`은 VMware, Inc. 또는 그 계열사의 상표입니다.
+- `Slack`은 Salesforce, Inc. 또는 그 계열사의 상표입니다.
+- 본 프로젝트는 Slack/Spring과 제휴 또는 후원 관계가 없는 독립 오픈소스 프로젝트입니다.
 
 ## 배포 로드맵
 - 현재 단계: Phase 2/3 구현 진행

@@ -1,6 +1,6 @@
 # RELEASE GUIDE
 
-`safe-slack-bolt-spring-starter`를 Maven Central에 실배포하기 위한 운영 문서입니다.
+`slack-bolt-socket-mode-spring-boot-starter`를 Maven Central에 실배포하기 위한 운영 문서입니다.
 
 ## 1) Sonatype 준비
 1. [Central Portal](https://central.sonatype.com/)에서 `io.github.inshakr2` namespace 권한을 확인합니다.
@@ -60,5 +60,5 @@ git push origin v1.0.0
 3. GitHub Release 노트 작성
 
 ## 참고
-- `safe-slack-bolt-core`, `safe-slack-bolt-spring-boot-starter`만 배포 대상
-- `safe-slack-bolt-sample`은 배포 대상 제외
+- `slack-bolt-socket-mode-core`, `slack-bolt-socket-mode-spring-boot-starter`만 배포 대상
+- `slack-bolt-socket-mode-sample`은 배포 대상 제외
