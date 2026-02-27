@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="docs/readme/assets/logo.svg" alt="Slack Bolt Socket Mode Starter" width="520"/>
+  <img src="./assets/logo.svg" alt="Slack Bolt Socket Mode Starter" width="520"/>
 </p>
 
 <h1 align="center">Slack Bolt Socket Mode Spring Boot Starter</h1>
 
 <p align="center">
-  Slack Socket Mode 핸들러를 <strong>빠르게</strong>, <strong>안정적으로</strong>, <strong>일관되게</strong> 붙이기 위한 Spring Boot Starter
+  A Spring Boot starter to wire Slack Socket Mode handlers <strong>fast</strong>, <strong>reliably</strong>, and <strong>consistently</strong>
 </p>
 
 <p align="center">
@@ -14,18 +14,18 @@
   <a href="https://central.sonatype.com/artifact/io.github.inshakr2/slack-bolt-socket-mode-spring-boot-starter"><img src="https://img.shields.io/maven-central/v/io.github.inshakr2/slack-bolt-socket-mode-spring-boot-starter" alt="Maven Central Starter"/></a>
   <a href="https://central.sonatype.com/artifact/io.github.inshakr2/slack-bolt-socket-mode-core"><img src="https://img.shields.io/maven-central/v/io.github.inshakr2/slack-bolt-socket-mode-core" alt="Maven Central Core"/></a>
   <a href="https://github.com/inshakr2/slack-bolt-socket-mode-spring-boot-starter/actions/workflows/build-test.yml"><img src="https://github.com/inshakr2/slack-bolt-socket-mode-spring-boot-starter/actions/workflows/build-test.yml/badge.svg" alt="Build"/></a>
-  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-orange.svg" alt="License: Apache-2.0"/></a>
+  <a href="../../LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-orange.svg" alt="License: Apache-2.0"/></a>
 </p>
 
 <p align="center">
-  한국어 · <a href="./docs/readme/README.en.md">English</a>
+  <a href="../../README.md">한국어</a> · English
 </p>
 
 ---
 
-Slack Bolt App 웹소켓 연동마다 등록 코드, 예외 처리, 수명주기 관리를 반복해서 작성하지 마세요.  
-Slack Bolt Socket Mode Spring Boot Starter는 이 반복 작업을 공통화해서 더 안정적이고 더 편리하게 연동하도록 돕습니다.  
-표준 핸들러 타입뿐 아니라, 팀에서 필요한 커스텀 패턴도 같은 방식으로 확장할 수 있습니다.
+Stop writing manual Socket Mode wiring for every Slack Bolt app.  
+Slack Bolt Socket Mode Spring Boot Starter standardizes registration, fallback handling, and lifecycle control so integration stays stable and simple.  
+Even when you need custom interaction patterns, you can extend them with the same handler approach.
 
 ```java
 @Component
@@ -45,25 +45,25 @@ public class TicketSubmitHandler extends AbstractViewSubmissionHandler {
 
 ---
 
-### 무엇이 좋아지나?
-- Slack Bolt 핸들러 등록을 자동화해서 비즈니스 로직 구현에 집중할 수 있습니다.
-- 핸들러 예외 발생 시 공통 로깅 + `ctx.ack()` fallback으로 응답 안정성을 높입니다.
-- 핸들러 식별자(identifier) 중복을 앱 시작 시 Fail-Fast로 차단합니다.
-- `action_id` / `callback_id` / `command`만 정확히 정의하면 바로 동작합니다.
+### Why this starter?
+- Automates Slack Bolt handler registration so you can focus on business logic.
+- Improves response stability with common logging + `ctx.ack()` fallback on exceptions.
+- Blocks duplicate handler identifiers at startup with fail-fast validation.
+- Works as soon as `action_id` / `callback_id` / `command` is defined correctly.
 
-### 왜 편한가? (직접 구현 대비)
+### Without this starter vs with this starter
 
-| 항목 | 직접 구현 시 | Starter 사용 시 |
+| Item | Without starter | With starter |
 |---|---|---|
-| 핸들러 등록 | `App` 등록 코드/분기 직접 작성 | 추상 핸들러 구현 + `@Component` |
-| 예외 처리 | 핸들러마다 try/catch 반복 | 공통 보호 래퍼 내장 |
-| 중복 식별자 검증 | 별도 Set 검증 코드 필요 | 자동 검증 내장 |
-| Socket Mode 시작/종료 | 수명주기 직접 관리 | 자동 구성/자동 시작 옵션 |
-| 구현 집중 포인트 | 인프라 코드 + 비즈니스 코드 혼재 | `handle()` 비즈니스 로직 중심 |
+| Handler registration | Manual `App` registration and branching | Implement abstract handler + `@Component` |
+| Error handling | Repeated try/catch per handler | Built-in protected wrapper |
+| Duplicate identifier checks | Separate Set validation code | Built-in automatic validation |
+| Socket Mode lifecycle | Manual startup/shutdown management | Auto configuration + auto startup option |
+| Main coding focus | Infra code mixed with business logic | Focus on business logic in `handle()` |
 
-## 3분 사용법
+## Quick usage
 
-### 1) 의존성 추가
+### 1) Add dependencies
 
 #### Gradle
 ```gradle
@@ -83,26 +83,26 @@ dependencies {
 </dependencies>
 ```
 
-### 2) Slack App 생성 (Manifest)
+### 2) Create Slack App (Manifest)
 
-1. Slack App 생성 화면에서 **From an app manifest** 선택
-2. [`slack-bolt-socket-mode-sample/manifest.json`](./slack-bolt-socket-mode-sample/manifest.json) 내용 붙여넣기
-3. 토큰 발급 전 아래 설정을 먼저 완료
-   - **Socket Mode 활성화** 및 App-Level Token(`xapp-...`) 생성 (`connections:write` scope 필요)
-   - **OAuth scopes** 설정 후 워크스페이스에 앱 설치 (Bot Token `xoxb-...` 발급)
-4. 발급한 토큰을 환경 변수로 설정
+1. In Slack App creation, choose **From an app manifest**
+2. Paste [`slack-bolt-socket-mode-sample/manifest.json`](../../slack-bolt-socket-mode-sample/manifest.json)
+3. Complete token-related setup first
+   - Enable **Socket Mode** and create an App-Level Token (`xapp-...`) with `connections:write`
+   - Configure **OAuth scopes** and install the app to the workspace to issue Bot Token (`xoxb-...`)
+4. Export issued tokens as environment variables
 
 ```bash
 export SLACK_BOT_TOKEN=xoxb-...
 export SLACK_APP_TOKEN=xapp-...
 ```
 
-자세한 가이드는 Slack 공식 문서를 참고하세요.
+For detailed steps, refer to Slack official documentation.
 - [Configuring apps with app manifests](https://docs.slack.dev/app-manifests/configuring-apps-with-app-manifests/)
 - [Socket Mode](https://docs.slack.dev/apis/socket-mode)
 - [Tokens](https://docs.slack.dev/authentication/tokens/)
 
-### 3) 애플리케이션 설정
+### 3) Configure application properties
 
 ```yaml
 slack:
@@ -115,9 +115,9 @@ slack:
       socket-mode-auto-startup: true
 ```
 
-### 4) 핸들러 작성 (핵심)
+### 4) Write handler classes (core)
 
-`callback_id`(또는 `action_id`, `command`)를 지정하고, `handle()`에 원하는 로직만 작성하면 됩니다.
+Set `callback_id` (or `action_id`, `command`) and only implement custom logic inside `handle()`.
 
 ```java
 // src/main/java/.../handler/VocConfirmSubmitHandler.java
@@ -131,7 +131,7 @@ public class VocConfirmSubmitHandler extends AbstractViewSubmissionHandler {
 
     @Override
     protected Response handle(ViewSubmissionRequest req, ViewSubmissionContext ctx) {
-        // 비즈니스 로직 커스터마이징
+        // Custom business logic
         return ctx.ack();
     }
 }
@@ -149,35 +149,35 @@ public class PingActionHandler extends AbstractBlockActionHandler {
 
     @Override
     protected Response handle(BlockActionRequest req, ActionContext ctx) {
-        // 비즈니스 로직 커스터마이징
+        // Custom business logic
         return ctx.ack();
     }
 }
 ```
 
-### 5) 실행
+### 5) Run
 
 ```bash
 ./gradlew :slack-bolt-socket-mode-sample:bootRun
 ```
 
-## 직접 구현 예시 vs Starter 예시
+## Direct implementation example vs Starter example
 
-편의성 차이는 코드 양보다 유지보수 범위에서 더 크게 벌어집니다.
+The convenience gap grows more in maintenance scope than in just line count.
 
-| 비교 포인트 | 직접 구현 | Starter 사용 |
+| Comparison point | Without starter | With starter |
 |---|---|---|
-| 신규 인터랙션 1개 추가 | 설정 클래스 + 등록 코드 + 예외 처리 코드까지 함께 수정 | 핸들러 클래스 1개 추가 후 `id + handle()`만 구현 |
-| 공통 정책 변경(로깅/응답) | 모든 핸들러 등록부 점검/수정 필요 | 공통 계층에서 일괄 반영 |
-| 운영 안정성 | 중복 식별자/예외 누락을 코드 리뷰로만 방지 | Fail-Fast + fallback 기본 제공 |
+| Add one new interaction | Update config class, registration logic, and error handling paths | Add one handler class and implement `id + handle()` |
+| Change common policy (logging/ack rules) | Revisit and edit multiple registration branches | Apply once in shared layer |
+| Operational stability | Prevent duplicate IDs/exception leaks mainly by review | Built-in fail-fast + fallback |
 
-### 직접 구현 시 필요한 클래스 예시
+### Example classes required in manual implementation
 
-직접 구현할 때는 보통 아래 클래스들을 직접 작성해야 합니다.
+In manual implementation, you typically need to write classes like below.
 
-- `src/main/java/.../config/SlackManualBoltConfig.java` (Bolt `App` 생성 + 핸들러 등록)
-- `src/main/java/.../lifecycle/SocketModeRunner.java` (Socket Mode 시작/종료)
-- `src/main/java/.../registry/HandlerIdentifierValidator.java` (식별자 중복 검증)
+- `src/main/java/.../config/SlackManualBoltConfig.java` (build Bolt `App` + register handlers)
+- `src/main/java/.../lifecycle/SocketModeRunner.java` (start/stop Socket Mode)
+- `src/main/java/.../registry/HandlerIdentifierValidator.java` (validate duplicate identifiers)
 
 ```java
 // src/main/java/.../config/SlackManualBoltConfig.java
@@ -267,9 +267,9 @@ public class HandlerIdentifierValidator {
 }
 ```
 
-### Starter 사용 시 클래스 예시
+### Example class with starter
 
-Starter를 사용하면 대부분의 인프라 코드는 자동 구성에 맡기고, 핸들러 클래스만 작성하면 됩니다.
+With starter, most infra is auto-configured and you mainly write handler classes.
 
 ```java
 // src/main/java/.../handler/HelloCommandHandler.java
@@ -288,21 +288,21 @@ public class HelloCommandHandler extends AbstractCommandHandler {
 }
 ```
 
-핵심 차이: 직접 구현은 인프라 코드를 계속 유지해야 하지만, Starter는 기능 추가 시에도 `식별자 + handle()`만 확장하면 됩니다.
+Key difference: manual implementation keeps accumulating infra maintenance, while starter lets new features stay focused on `identifier + handle()`.
 
-## 설정 레퍼런스
+## Property reference
 
 | Key | Required | Default | Description |
 |---|---|---|---|
-| `slack.bolt.socket-mode.enabled` | N | `true` | starter 활성화 여부 |
+| `slack.bolt.socket-mode.enabled` | N | `true` | Enable starter |
 | `slack.bolt.socket-mode.bot-token` | Y (`enabled=true`) | - | Slack bot token |
-| `slack.bolt.socket-mode.socket-mode-enabled` | N | `true` | Socket Mode 사용 여부 |
+| `slack.bolt.socket-mode.socket-mode-enabled` | N | `true` | Enable Socket Mode |
 | `slack.bolt.socket-mode.app-token` | Y (`socket-mode-enabled=true`) | - | Slack app token |
-| `slack.bolt.socket-mode.socket-mode-auto-startup` | N | `true` | 앱 시작 시 Socket Mode 자동 시작 여부 |
+| `slack.bolt.socket-mode.socket-mode-auto-startup` | N | `true` | Auto start Socket Mode on app startup |
 
-> `1.0.0`부터 starter가 Socket Mode 필수 런타임(`javax.websocket-api`, `tyrus-standalone-client`)을 기본 제공합니다.
+> Since `1.0.0`, the starter includes required Socket Mode runtimes (`javax.websocket-api`, `tyrus-standalone-client`) by default.
 
-## 지원 핸들러 타입
+## Supported handler types
 
 - `AbstractCommandHandler`
 - `AbstractBlockActionHandler`
@@ -311,29 +311,29 @@ public class HelloCommandHandler extends AbstractCommandHandler {
 - `AbstractMessageEventHandler`
 - `AbstractAppHomeOpenedEventHandler`
 
-## 안전 장치
+## Safety features
 
-- 핸들러 실행 예외 시 공통 로깅 후 `ctx.ack()` fallback
-- 핸들러 식별자 중복 시 앱 시작 단계에서 즉시 실패(Fail-Fast)
+- Common logging + `ctx.ack()` fallback on handler exceptions
+- Fail-fast startup error when handler identifiers are duplicated
 
-## 로컬 검증
+## Local verification
 
 ```bash
 ./gradlew clean test
 ./gradlew publishToMavenLocal -Psigning.skip=true
 ```
 
-## 모듈
+## Modules
 
 - `slack-bolt-socket-mode-core`
 - `slack-bolt-socket-mode-spring-boot-starter`
-- `slack-bolt-socket-mode-sample` (예제 앱, 배포 대상 아님)
+- `slack-bolt-socket-mode-sample` (sample app, not published)
 
-## 보안 주의
+## Security notes
 
-- 실제 Slack 토큰은 저장소에 커밋하지 마세요.
-- CI 비밀값(`secrets`) 또는 런타임 환경변수만 사용하세요.
+- Do not commit real Slack tokens to the repository.
+- Use CI secrets or runtime environment variables only.
 
-## 라이선스
+## License
 
-[Apache License 2.0](./LICENSE)
+[Apache License 2.0](../../LICENSE)

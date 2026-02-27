@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="220" viewBox="0 0 640 220" role="img" aria-labelledby="title desc">
+  <title id="title">Slack Bolt Socket Mode Starter</title>
+  <desc id="desc">Project logo for Slack Bolt Socket Mode Spring Boot Starter</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="624" height="204" rx="24" fill="url(#bg)"/>
+  <rect x="24" y="24" width="592" height="172" rx="18" fill="#0b1224" stroke="#334155"/>
+
+  <g transform="translate(56 56)">
+    <rect x="0" y="0" width="108" height="108" rx="20" fill="#111827" stroke="#334155"/>
+    <rect x="18" y="18" width="72" height="72" rx="14" fill="url(#chip)" opacity="0.24"/>
+    <path d="M62 16 L35 60 H55 L43 96 L74 50 H55 Z" fill="url(#bolt)"/>
+  </g>
+
+  <g transform="translate(190 72)">
+    <text x="0" y="0" fill="#f8fafc" font-family="Verdana, sans-serif" font-size="34" font-weight="700">
+      Slack Bolt
+    </text>
+    <text x="0" y="42" fill="#cbd5e1" font-family="Verdana, sans-serif" font-size="26" font-weight="600">
+      Socket Mode Starter
+    </text>
+    <text x="0" y="78" fill="#94a3b8" font-family="Verdana, sans-serif" font-size="16">
+      Implement ID, Customize handle()
+    </text>
+  </g>
+</svg>
