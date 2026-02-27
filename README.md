@@ -311,6 +311,37 @@ public class HelloCommandHandler extends AbstractCommandHandler {
 - `AbstractMessageEventHandler`
 - `AbstractAppHomeOpenedEventHandler`
 
+## Experimental: Modal Input DSL (Phase 1)
+
+반복적으로 작성하던 `block_id`, `action_id`, `input(...)` 블록 생성을 공통 DSL로 줄일 수 있습니다.
+
+```java
+import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalFieldKey;
+import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalOption;
+import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalBuilder;
+
+ModalFieldKey<String> ownerKey = ModalFieldKey.singleSelect("owner");
+ModalFieldKey<?> targetDateKey = ModalFieldKey.date("target_date");
+ModalFieldKey<?> targetTimeKey = ModalFieldKey.time("target_time");
+ModalFieldKey<String> agendaKey = ModalFieldKey.text("agenda");
+
+View view = SlackModalBuilder.modal("socket-mode-view-submit", "Sample Modal", "Submit", "Cancel")
+        .privateMetadata("source=global_shortcut")
+        .addHeader("Schedule a follow-up action")
+        .addStaticSelect(ownerKey, "Owner", "Select owner", List.of(
+                ModalOption.of("Operator A", "1001"),
+                ModalOption.of("Operator B", "1002")
+        ), false)
+        .addDatePicker(targetDateKey, "Target date", "Pick a date", false)
+        .addTimePicker(targetTimeKey, "Target time", "Pick a time", false)
+        .addTextInput(agendaKey, "Agenda", "Describe the agenda", false, true)
+        .build();
+```
+
+- `ModalFieldKey`가 `block_id/action_id`를 자동 생성합니다.
+- `SlackModalBuilder`는 callback/title/submit/close와 input block을 한 번에 조립합니다.
+- 현재 지원 입력 타입: `plain_text_input`, `datepicker`, `timepicker`, `static_select`, `radio_buttons`
+
 ## 안전 장치
 
 - 핸들러 실행 예외 시 공통 로깅 후 `ctx.ack()` fallback

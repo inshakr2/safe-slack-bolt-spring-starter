@@ -311,6 +311,37 @@ Key difference: manual implementation keeps accumulating infra maintenance, whil
 - `AbstractMessageEventHandler`
 - `AbstractAppHomeOpenedEventHandler`
 
+## Experimental: Modal Input DSL (Phase 1)
+
+You can reduce repetitive `block_id`, `action_id`, and `input(...)` modal code with the shared DSL.
+
+```java
+import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalFieldKey;
+import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalOption;
+import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalBuilder;
+
+ModalFieldKey<String> ownerKey = ModalFieldKey.singleSelect("owner");
+ModalFieldKey<?> targetDateKey = ModalFieldKey.date("target_date");
+ModalFieldKey<?> targetTimeKey = ModalFieldKey.time("target_time");
+ModalFieldKey<String> agendaKey = ModalFieldKey.text("agenda");
+
+View view = SlackModalBuilder.modal("socket-mode-view-submit", "Sample Modal", "Submit", "Cancel")
+        .privateMetadata("source=global_shortcut")
+        .addHeader("Schedule a follow-up action")
+        .addStaticSelect(ownerKey, "Owner", "Select owner", List.of(
+                ModalOption.of("Operator A", "1001"),
+                ModalOption.of("Operator B", "1002")
+        ), false)
+        .addDatePicker(targetDateKey, "Target date", "Pick a date", false)
+        .addTimePicker(targetTimeKey, "Target time", "Pick a time", false)
+        .addTextInput(agendaKey, "Agenda", "Describe the agenda", false, true)
+        .build();
+```
+
+- `ModalFieldKey` derives `block_id/action_id` automatically.
+- `SlackModalBuilder` assembles callback/title/submit/close and input blocks in one place.
+- Currently supported input types: `plain_text_input`, `datepicker`, `timepicker`, `static_select`, `radio_buttons`
+
 ## Safety features
 
 - Common logging + `ctx.ack()` fallback on handler exceptions
