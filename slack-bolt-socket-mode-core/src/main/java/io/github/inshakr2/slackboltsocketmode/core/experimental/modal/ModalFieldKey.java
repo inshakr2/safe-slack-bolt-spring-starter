@@ -2,7 +2,6 @@ package io.github.inshakr2.slackboltsocketmode.core.experimental.modal;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 public final class ModalFieldKey<T> {
@@ -20,7 +19,10 @@ public final class ModalFieldKey<T> {
     private ModalFieldKey(String name, ModalFieldType fieldType) {
         String normalized = validateName(name);
         this.name = normalized;
-        this.fieldType = Objects.requireNonNull(fieldType, "fieldType must not be null");
+        if (fieldType == null) {
+            throw SlackModalValidationException.nullField("fieldType");
+        }
+        this.fieldType = fieldType;
         this.blockId = validateIdLength(normalized + BLOCK_ID_SUFFIX, "blockId");
         this.actionId = validateIdLength(normalized + ACTION_ID_SUFFIX, "actionId");
     }
@@ -62,20 +64,22 @@ public final class ModalFieldKey<T> {
     }
 
     private static String validateName(String name) {
-        Objects.requireNonNull(name, "name must not be null");
+        if (name == null) {
+            throw SlackModalValidationException.nullField("name");
+        }
         String normalized = name.trim();
         if (normalized.isEmpty()) {
-            throw new IllegalArgumentException("name must not be blank");
+            throw SlackModalValidationException.blankField("name");
         }
         if (!KEY_PATTERN.matcher(normalized).matches()) {
-            throw new IllegalArgumentException("name must match pattern: " + KEY_PATTERN.pattern());
+            throw SlackModalValidationException.patternMismatch("name", KEY_PATTERN.pattern(), normalized);
         }
         return normalized;
     }
 
     private static String validateIdLength(String value, String fieldName) {
         if (value.length() > MAX_ID_LENGTH) {
-            throw new IllegalArgumentException(fieldName + " length must be <= " + MAX_ID_LENGTH);
+            throw SlackModalValidationException.lengthExceeded(fieldName, MAX_ID_LENGTH, value.length());
         }
         return value;
     }

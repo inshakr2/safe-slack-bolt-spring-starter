@@ -47,8 +47,8 @@ class ModalFieldKeyTest {
 
         // When & Then
         assertThatThrownBy(() -> ModalFieldKey.text(invalid))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("name must match pattern");
+                .isInstanceOf(SlackModalValidationException.class)
+                .hasMessageContaining("must match pattern");
     }
 
     @Test
@@ -58,8 +58,8 @@ class ModalFieldKeyTest {
 
         // When & Then
         assertThatThrownBy(() -> ModalFieldKey.text(blank))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("name must not be blank");
+                .isInstanceOf(SlackModalValidationException.class)
+                .hasMessageContaining("must not be blank");
     }
 
     @Test
@@ -69,7 +69,7 @@ class ModalFieldKeyTest {
 
         // When & Then
         assertThatThrownBy(() -> ModalFieldKey.text(tooLongName))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SlackModalValidationException.class)
                 .hasMessageContaining("length must be <=");
     }
 }

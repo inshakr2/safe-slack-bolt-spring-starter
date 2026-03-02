@@ -1,7 +1,5 @@
 package io.github.inshakr2.slackboltsocketmode.core.experimental.modal;
 
-import java.util.Objects;
-
 public final class SlackModalOpenResult {
 
     private final boolean opened;
@@ -35,10 +33,12 @@ public final class SlackModalOpenResult {
     }
 
     private static String requireText(String value, String fieldName) {
-        Objects.requireNonNull(value, fieldName + " must not be null");
+        if (value == null) {
+            throw SlackModalValidationException.nullField(fieldName);
+        }
         String trimmed = value.trim();
         if (trimmed.isEmpty()) {
-            throw new SlackModalValidationException(fieldName + " must not be blank");
+            throw SlackModalValidationException.blankField(fieldName);
         }
         return trimmed;
     }
@@ -49,7 +49,7 @@ public final class SlackModalOpenResult {
         }
         String trimmed = value.trim();
         if (trimmed.isEmpty()) {
-            throw new SlackModalValidationException(fieldName + " must not be blank");
+            throw SlackModalValidationException.blankField(fieldName);
         }
         return trimmed;
     }

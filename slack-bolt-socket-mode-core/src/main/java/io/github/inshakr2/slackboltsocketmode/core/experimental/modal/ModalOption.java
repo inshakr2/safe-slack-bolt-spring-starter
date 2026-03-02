@@ -2,18 +2,19 @@ package io.github.inshakr2.slackboltsocketmode.core.experimental.modal;
 
 import com.slack.api.model.block.composition.OptionObject;
 
-import java.util.Objects;
-
 import static com.slack.api.model.block.composition.BlockCompositions.plainText;
 
 public final class ModalOption {
+
+    private static final int MAX_TEXT_LENGTH = 75;
+    private static final int MAX_VALUE_LENGTH = 150;
 
     private final String text;
     private final String value;
 
     private ModalOption(String text, String value) {
-        this.text = requireText(text, "text");
-        this.value = requireText(value, "value");
+        this.text = requireLength(text, "text", MAX_TEXT_LENGTH);
+        this.value = requireLength(value, "value", MAX_VALUE_LENGTH);
     }
 
     public static ModalOption of(String text, String value) {
@@ -35,11 +36,16 @@ public final class ModalOption {
                 .build();
     }
 
-    private static String requireText(String value, String fieldName) {
-        Objects.requireNonNull(value, fieldName + " must not be null");
+    private static String requireLength(String value, String fieldName, int maxLength) {
+        if (value == null) {
+            throw SlackModalValidationException.nullField(fieldName);
+        }
         String trimmed = value.trim();
         if (trimmed.isEmpty()) {
-            throw new SlackModalValidationException(fieldName + " must not be blank");
+            throw SlackModalValidationException.blankField(fieldName);
+        }
+        if (trimmed.length() > maxLength) {
+            throw SlackModalValidationException.lengthExceeded(fieldName, maxLength, trimmed.length());
         }
         return trimmed;
     }

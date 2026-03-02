@@ -107,7 +107,49 @@ class SlackModalBuilderTest {
         assertThatThrownBy(() -> SlackModalBuilder.modal("confirm-submit", "확정 처리", "확인", "취소")
                 .addStaticSelect(selectKey, "담당자", "담당자를 선택하세요", List.of(), false))
                 .isInstanceOf(SlackModalValidationException.class)
-                .hasMessageContaining("options must not be empty");
+                .hasMessageContaining("must not be empty");
+    }
+
+    @Test
+    void rejectsDuplicateInputIdentifiers() {
+        // Given
+        ModalFieldKey<String> duplicatedKey = ModalFieldKey.text("agenda");
+
+        // When & Then
+        assertThatThrownBy(() -> SlackModalBuilder.modal("confirm-submit", "확정 처리", "확인", "취소")
+                .addTextInput(duplicatedKey, "사유", "입력하세요", false, false)
+                .addTextInput(duplicatedKey, "사유2", "입력하세요", false, false))
+                .isInstanceOf(SlackModalValidationException.class)
+                .hasMessageContaining("duplicate value");
+    }
+
+    @Test
+    void rejectsWhenRadioOptionCountExceedsLimit() {
+        // Given
+        ModalFieldKey<String> radioKey = ModalFieldKey.radio("action_type");
+        List<ModalOption> tooManyOptions = List.of(
+                ModalOption.of("1", "1"), ModalOption.of("2", "2"), ModalOption.of("3", "3"),
+                ModalOption.of("4", "4"), ModalOption.of("5", "5"), ModalOption.of("6", "6"),
+                ModalOption.of("7", "7"), ModalOption.of("8", "8"), ModalOption.of("9", "9"),
+                ModalOption.of("10", "10"), ModalOption.of("11", "11")
+        );
+
+        // When & Then
+        assertThatThrownBy(() -> SlackModalBuilder.modal("confirm-submit", "확정 처리", "확인", "취소")
+                .addRadioButtons(radioKey, "대응구분", tooManyOptions, false))
+                .isInstanceOf(SlackModalValidationException.class)
+                .hasMessageContaining("size must be <=");
+    }
+
+    @Test
+    void rejectsWhenBuildWithoutBlocks() {
+        // Given
+        SlackModalBuilder builder = SlackModalBuilder.modal("confirm-submit", "확정 처리", "확인", "취소");
+
+        // When & Then
+        assertThatThrownBy(builder::build)
+                .isInstanceOf(SlackModalValidationException.class)
+                .hasMessageContaining("must not be empty");
     }
 
     @Test
@@ -118,7 +160,8 @@ class SlackModalBuilderTest {
         // When & Then
         assertThatThrownBy(() -> SlackModalBuilder.modal(tooLongCallbackId, "확정 처리", "확인", "취소"))
                 .isInstanceOf(SlackModalValidationException.class)
-                .hasMessageContaining("callbackId length must be <= 255");
+                .hasMessageContaining("field=callbackId")
+                .hasMessageContaining("length must be <= 255");
     }
 
     @Test
@@ -130,6 +173,7 @@ class SlackModalBuilderTest {
         assertThatThrownBy(() -> SlackModalBuilder.modal("confirm-submit", "확정 처리", "확인", "취소")
                 .privateMetadata(tooLongMetadata))
                 .isInstanceOf(SlackModalValidationException.class)
-                .hasMessageContaining("privateMetadata length must be <= 3000");
+                .hasMessageContaining("field=privateMetadata")
+                .hasMessageContaining("length must be <= 3000");
     }
 }

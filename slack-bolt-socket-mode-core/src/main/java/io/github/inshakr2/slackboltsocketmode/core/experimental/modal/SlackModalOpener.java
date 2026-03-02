@@ -75,10 +75,12 @@ public final class SlackModalOpener {
     }
 
     private static String requireText(String value, String fieldName) {
-        Objects.requireNonNull(value, fieldName + " must not be null");
+        if (value == null) {
+            throw SlackModalValidationException.nullField(fieldName);
+        }
         String trimmed = value.trim();
         if (trimmed.isEmpty()) {
-            throw new SlackModalValidationException(fieldName + " must not be blank");
+            throw SlackModalValidationException.blankField(fieldName);
         }
         return trimmed;
     }
