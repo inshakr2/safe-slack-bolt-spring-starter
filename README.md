@@ -319,6 +319,7 @@ public class HelloCommandHandler extends AbstractCommandHandler {
 import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalFieldKey;
 import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalOption;
 import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalBuilder;
+import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalOpener;
 
 ModalFieldKey<String> ownerKey = ModalFieldKey.singleSelect("owner");
 ModalFieldKey<?> targetDateKey = ModalFieldKey.date("target_date");
@@ -336,10 +337,14 @@ View view = SlackModalBuilder.modal("socket-mode-view-submit", "Sample Modal", "
         .addTimePicker(targetTimeKey, "Target time", "Pick a time", false)
         .addTextInput(agendaKey, "Agenda", "Describe the agenda", false, true)
         .build();
+
+return SlackModalOpener.openOrAck(ctx, req.getPayload().getTriggerId(), view);
 ```
 
 - `ModalFieldKey`가 `block_id/action_id`를 자동 생성합니다.
 - `SlackModalBuilder`는 callback/title/submit/close와 input block을 한 번에 조립합니다.
+- `SlackModalOpener.openOrAck(ctx, triggerId, view)`는 모달 오픈 실패 시 기본 실패 payload로 `ackWithJson` 응답을 반환합니다.
+- `SlackModalValidationException`은 `experimental.modal` 패키지 내부 검증 실패에 한정해 사용됩니다.
 - 현재 지원 입력 타입: `plain_text_input`, `datepicker`, `timepicker`, `static_select`, `radio_buttons`
 
 ## 안전 장치

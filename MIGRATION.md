@@ -74,10 +74,13 @@ View view = SlackModalBuilder.modal("socket-mode-view-submit", "Sample Modal", "
         .addTimePicker(timeKey, "Target time", "Pick a time", false)
         .addTextInput(agendaKey, "Agenda", "Describe the agenda", false, true)
         .build();
+
+return SlackModalOpener.openOrAck(ctx, req.getPayload().getTriggerId(), view);
 ```
 
 - 현재 지원 타입: `plain_text_input`, `datepicker`, `timepicker`, `static_select`, `radio_buttons`
 - 패키지: `io.github.inshakr2.slackboltsocketmode.core.experimental.modal`
+- `SlackModalValidationException`은 modal DSL 검증 실패(`experimental.modal` 내부)에만 사용됩니다.
 
 ## 7. View Submission 검증 응답 처리
 - `ViewSubmissionValidationErrors` 유틸을 사용해 block 단위 에러를 누적하고 `ackWithErrors`로 응답할 수 있습니다.

@@ -319,6 +319,7 @@ You can reduce repetitive `block_id`, `action_id`, and `input(...)` modal code w
 import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalFieldKey;
 import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalOption;
 import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalBuilder;
+import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalOpener;
 
 ModalFieldKey<String> ownerKey = ModalFieldKey.singleSelect("owner");
 ModalFieldKey<?> targetDateKey = ModalFieldKey.date("target_date");
@@ -336,10 +337,14 @@ View view = SlackModalBuilder.modal("socket-mode-view-submit", "Sample Modal", "
         .addTimePicker(targetTimeKey, "Target time", "Pick a time", false)
         .addTextInput(agendaKey, "Agenda", "Describe the agenda", false, true)
         .build();
+
+return SlackModalOpener.openOrAck(ctx, req.getPayload().getTriggerId(), view);
 ```
 
 - `ModalFieldKey` derives `block_id/action_id` automatically.
 - `SlackModalBuilder` assembles callback/title/submit/close and input blocks in one place.
+- `SlackModalOpener.openOrAck(ctx, triggerId, view)` returns `ackWithJson` with a default failure payload when opening a modal fails.
+- `SlackModalValidationException` is used only for validation failures inside the `experimental.modal` package.
 - Currently supported input types: `plain_text_input`, `datepicker`, `timepicker`, `static_select`, `radio_buttons`
 
 ## Safety features
