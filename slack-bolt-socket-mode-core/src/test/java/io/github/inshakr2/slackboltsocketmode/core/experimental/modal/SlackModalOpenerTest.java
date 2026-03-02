@@ -10,8 +10,9 @@ import com.slack.api.model.view.View;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -34,6 +35,31 @@ class SlackModalOpenerTest {
 
         // Then
         assertThat(opened).isTrue();
+    }
+
+    @Test
+    void openResultReturnsFailureDetailsWhenViewsOpenFails() throws Exception {
+        // Given
+        Context context = mock(Context.class);
+        MethodsClient methodsClient = mock(MethodsClient.class);
+        ViewsOpenResponse viewsOpenResponse = mock(ViewsOpenResponse.class);
+        when(context.client()).thenReturn(methodsClient);
+        when(methodsClient.viewsOpen(anyConfigurator())).thenReturn(viewsOpenResponse);
+        when(viewsOpenResponse.isOk()).thenReturn(false);
+        when(viewsOpenResponse.getError()).thenReturn("invalid_trigger");
+        when(viewsOpenResponse.getWarning()).thenReturn("warning-message");
+
+        // When
+        SlackModalOpenResult result = SlackModalOpener.openResult(
+                context,
+                "trigger-1",
+                View.builder().type("modal").build()
+        );
+
+        // Then
+        assertThat(result.isOpened()).isFalse();
+        assertThat(result.getError()).isEqualTo("invalid_trigger");
+        assertThat(result.getWarning()).isEqualTo("warning-message");
     }
 
     @Test
@@ -68,6 +94,7 @@ class SlackModalOpenerTest {
         when(context.client()).thenReturn(methodsClient);
         when(methodsClient.viewsOpen(anyConfigurator())).thenReturn(viewsOpenResponse);
         when(viewsOpenResponse.isOk()).thenReturn(false);
+        when(viewsOpenResponse.getError()).thenReturn("invalid_trigger");
         when(context.ackWithJson(responseCaptor.capture())).thenReturn(ackWithJsonResponse);
 
         // When
@@ -75,21 +102,13 @@ class SlackModalOpenerTest {
 
         // Then
         assertThat(result).isSameAs(ackWithJsonResponse);
-        assertThat(responseCaptor.getValue()).isInstanceOf(Response.class);
-        Response failureResponse = (Response) responseCaptor.getValue();
-        assertThat(failureResponse.getStatusCode()).isEqualTo(500);
-        assertThat(failureResponse.getBody()).isEqualTo("Failed to open modal");
-    }
-
-    @Test
-    void failureResponseRejectsInvalidStatusCode() {
-        // Given
-        int invalidStatusCode = 99;
-
-        // When & Then
-        assertThatThrownBy(() -> SlackModalOpener.failureResponse(invalidStatusCode, "failed"))
-                .isInstanceOf(SlackModalValidationException.class)
-                .hasMessageContaining("statusCode must be between 100 and 599");
+        assertThat(responseCaptor.getValue()).isInstanceOf(Map.class);
+        @SuppressWarnings("unchecked")
+        Map<String, String> failurePayload = (Map<String, String>) responseCaptor.getValue();
+        assertThat(failurePayload)
+                .containsEntry("code", "SLACK_MODAL_OPEN_FAILED")
+                .containsEntry("message", "Failed to open modal")
+                .containsEntry("error", "invalid_trigger");
     }
 
     @SuppressWarnings("unchecked")

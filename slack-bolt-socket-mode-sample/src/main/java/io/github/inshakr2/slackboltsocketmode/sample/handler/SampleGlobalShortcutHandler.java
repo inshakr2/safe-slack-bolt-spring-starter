@@ -62,12 +62,6 @@ public class SampleGlobalShortcutHandler extends AbstractGlobalShortcutHandler {
                 )
                 .build();
 
-        return SlackModalOpener.openOrAck(
-                ctx,
-                req.getPayload().getTriggerId(),
-                modal,
-                500,
-                "Failed to open modal"
-        );
+        return SlackModalOpener.openOrAck(ctx, req.getPayload().getTriggerId(), modal);
     }
 }
