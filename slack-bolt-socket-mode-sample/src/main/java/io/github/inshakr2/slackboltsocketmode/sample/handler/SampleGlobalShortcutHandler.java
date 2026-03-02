@@ -7,6 +7,7 @@ import com.slack.api.model.view.View;
 import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalFieldKey;
 import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalOption;
 import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalBuilder;
+import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalOpener;
 import io.github.inshakr2.slackboltsocketmode.core.handler.shortcut.AbstractGlobalShortcutHandler;
 import org.springframework.stereotype.Component;
 
@@ -61,17 +62,12 @@ public class SampleGlobalShortcutHandler extends AbstractGlobalShortcutHandler {
                 )
                 .build();
 
-        boolean modalOpened = ctx.client().viewsOpen(r -> r
-                .triggerId(req.getPayload().getTriggerId())
-                .view(modal))
-                .isOk();
-
-        if (!modalOpened) {
-            return ctx.ackWithJson(Response.builder()
-                    .statusCode(500)
-                    .body("Failed to open modal")
-                    .build());
-        }
-        return ctx.ack();
+        return SlackModalOpener.openOrAck(
+                ctx,
+                req.getPayload().getTriggerId(),
+                modal,
+                500,
+                "Failed to open modal"
+        );
     }
 }
