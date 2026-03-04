@@ -1,4 +1,4 @@
-package io.github.inshakr2.slackboltsocketmode.core.experimental.modal;
+package io.github.inshakr2.slackboltsocketmode.core.modal;
 
 import com.slack.api.bolt.context.Context;
 import com.slack.api.bolt.response.Response;
@@ -7,14 +7,10 @@ import com.slack.api.methods.response.views.ViewsOpenResponse;
 import com.slack.api.model.view.View;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public final class SlackModalOpener {
 
-    private static final String DEFAULT_FAILURE_MESSAGE = "Failed to open modal";
-    private static final String DEFAULT_FAILURE_CODE = "SLACK_MODAL_OPEN_FAILED";
     private static final String UNKNOWN_OPEN_ERROR = "unknown_error";
 
     private SlackModalOpener() {
@@ -44,23 +40,24 @@ public final class SlackModalOpener {
     }
 
     public static Response openOrAck(Context ctx, String triggerId, View modal) throws IOException, SlackApiException {
+        return openOrAck(ctx, triggerId, modal, SlackModalFailureInfo.defaultInfo());
+    }
+
+    public static Response openOrAck(Context ctx,
+                                     String triggerId,
+                                     View modal,
+                                     SlackModalFailureInfo failInfo) throws IOException, SlackApiException {
         Objects.requireNonNull(ctx, "ctx must not be null");
         SlackModalOpenResult result = openResult(ctx, triggerId, modal);
         if (result.isOpened()) {
             return ctx.ack();
         }
-        return ctx.ackWithJson(failurePayload(result));
+        return ctx.ackWithJson(failurePayload(result, failInfo == null ? SlackModalFailureInfo.defaultInfo() : failInfo));
     }
 
-    private static Map<String, String> failurePayload(SlackModalOpenResult result) {
-        Map<String, String> payload = new LinkedHashMap<>();
-        payload.put("code", DEFAULT_FAILURE_CODE);
-        payload.put("message", DEFAULT_FAILURE_MESSAGE);
-        payload.put("error", result.getError());
-        if (result.getWarning() != null) {
-            payload.put("warning", result.getWarning());
-        }
-        return payload;
+    private static SlackModalFailurePayload failurePayload(SlackModalOpenResult result,
+                                                           SlackModalFailureInfo failInfo) {
+        return SlackModalFailurePayload.of(failInfo, result);
     }
 
     private static String normalizeError(String error) {

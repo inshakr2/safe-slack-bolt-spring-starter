@@ -1,4 +1,4 @@
-package io.github.inshakr2.slackboltsocketmode.core.experimental.modal;
+package io.github.inshakr2.slackboltsocketmode.core.modal;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

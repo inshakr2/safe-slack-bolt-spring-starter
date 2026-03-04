@@ -4,10 +4,11 @@ import com.slack.api.bolt.context.builtin.GlobalShortcutContext;
 import com.slack.api.bolt.request.builtin.GlobalShortcutRequest;
 import com.slack.api.bolt.response.Response;
 import com.slack.api.model.view.View;
-import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalFieldKey;
-import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalOption;
-import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalBuilder;
-import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalOpener;
+import io.github.inshakr2.slackboltsocketmode.core.modal.ModalFieldKey;
+import io.github.inshakr2.slackboltsocketmode.core.modal.ModalOption;
+import io.github.inshakr2.slackboltsocketmode.core.modal.SlackModalBuilder;
+import io.github.inshakr2.slackboltsocketmode.core.modal.SlackModalFailureInfo;
+import io.github.inshakr2.slackboltsocketmode.core.modal.SlackModalOpener;
 import io.github.inshakr2.slackboltsocketmode.core.handler.shortcut.AbstractGlobalShortcutHandler;
 import org.springframework.stereotype.Component;
 
@@ -62,6 +63,11 @@ public class SampleGlobalShortcutHandler extends AbstractGlobalShortcutHandler {
                 )
                 .build();
 
-        return SlackModalOpener.openOrAck(ctx, req.getPayload().getTriggerId(), modal);
+        return SlackModalOpener.openOrAck(
+                ctx,
+                req.getPayload().getTriggerId(),
+                modal,
+                SlackModalFailureInfo.of("SAMPLE_MODAL_OPEN_FAILED", "Sample modal open failed")
+        );
     }
 }

@@ -1,4 +1,4 @@
-package io.github.inshakr2.slackboltsocketmode.core.experimental.modal;
+package io.github.inshakr2.slackboltsocketmode.core.modal;
 
 import com.slack.api.model.block.DividerBlock;
 import com.slack.api.model.block.HeaderBlock;

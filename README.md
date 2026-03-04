@@ -316,10 +316,10 @@ public class HelloCommandHandler extends AbstractCommandHandler {
 반복적으로 작성하던 `block_id`, `action_id`, `input(...)` 블록 생성을 공통 DSL로 줄일 수 있습니다.
 
 ```java
-import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalFieldKey;
-import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.ModalOption;
-import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalBuilder;
-import io.github.inshakr2.slackboltsocketmode.core.experimental.modal.SlackModalOpener;
+import io.github.inshakr2.slackboltsocketmode.core.modal.ModalFieldKey;
+import io.github.inshakr2.slackboltsocketmode.core.modal.ModalOption;
+import io.github.inshakr2.slackboltsocketmode.core.modal.SlackModalBuilder;
+import io.github.inshakr2.slackboltsocketmode.core.modal.SlackModalOpener;
 
 ModalFieldKey<String> ownerKey = ModalFieldKey.singleSelect("owner");
 ModalFieldKey<?> targetDateKey = ModalFieldKey.date("target_date");
@@ -344,7 +344,7 @@ return SlackModalOpener.openOrAck(ctx, req.getPayload().getTriggerId(), view);
 - `ModalFieldKey`가 `block_id/action_id`를 자동 생성합니다.
 - `SlackModalBuilder`는 callback/title/submit/close와 input block을 한 번에 조립합니다.
 - `SlackModalOpener.openOrAck(ctx, triggerId, view)`는 모달 오픈 실패 시 기본 실패 payload로 `ackWithJson` 응답을 반환합니다.
-- `SlackModalValidationException`은 `experimental.modal` 패키지 내부 검증 실패에 한정해 사용됩니다.
+- `SlackModalValidationException`은 `core.modal` 패키지 내부 검증 실패에 한정해 사용됩니다.
 - 현재 지원 입력 타입: `plain_text_input`, `datepicker`, `timepicker`, `static_select`, `radio_buttons`
 
 ## 안전 장치

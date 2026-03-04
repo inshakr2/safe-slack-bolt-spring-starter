@@ -1,4 +1,4 @@
-package io.github.inshakr2.slackboltsocketmode.core.experimental.modal;
+package io.github.inshakr2.slackboltsocketmode.core.modal;
 
 import com.slack.api.bolt.context.Context;
 import com.slack.api.bolt.response.Response;
@@ -9,8 +9,6 @@ import com.slack.api.methods.response.views.ViewsOpenResponse;
 import com.slack.api.model.view.View;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -102,13 +100,74 @@ class SlackModalOpenerTest {
 
         // Then
         assertThat(result).isSameAs(ackWithJsonResponse);
-        assertThat(responseCaptor.getValue()).isInstanceOf(Map.class);
-        @SuppressWarnings("unchecked")
-        Map<String, String> failurePayload = (Map<String, String>) responseCaptor.getValue();
+        assertThat(responseCaptor.getValue()).isInstanceOf(SlackModalFailurePayload.class);
+        SlackModalFailurePayload failurePayload = (SlackModalFailurePayload) responseCaptor.getValue();
         assertThat(failurePayload)
-                .containsEntry("code", "SLACK_MODAL_OPEN_FAILED")
-                .containsEntry("message", "Failed to open modal")
-                .containsEntry("error", "invalid_trigger");
+                .extracting(SlackModalFailurePayload::getCode,
+                        SlackModalFailurePayload::getMessage,
+                        SlackModalFailurePayload::getError)
+                .containsExactly("SLACK_MODAL_OPEN_FAILED", "Failed to open modal", "invalid_trigger");
+    }
+
+    @Test
+    void openOrAckUsesCustomFailureInfoWhenProvided() throws Exception {
+        // Given
+        Context context = mock(Context.class);
+        MethodsClient methodsClient = mock(MethodsClient.class);
+        ViewsOpenResponse viewsOpenResponse = mock(ViewsOpenResponse.class);
+        Response ackWithJsonResponse = Response.builder().statusCode(200).body("ack-json").build();
+        ArgumentCaptor<Object> responseCaptor = ArgumentCaptor.forClass(Object.class);
+
+        when(context.client()).thenReturn(methodsClient);
+        when(methodsClient.viewsOpen(anyConfigurator())).thenReturn(viewsOpenResponse);
+        when(viewsOpenResponse.isOk()).thenReturn(false);
+        when(viewsOpenResponse.getError()).thenReturn("invalid_trigger");
+        when(context.ackWithJson(responseCaptor.capture())).thenReturn(ackWithJsonResponse);
+
+        // When
+        Response result = SlackModalOpener.openOrAck(
+                context,
+                "trigger-1",
+                View.builder().type("modal").build(),
+                SlackModalFailureInfo.of("CUSTOM_CODE", "Custom message")
+        );
+
+        // Then
+        assertThat(result).isSameAs(ackWithJsonResponse);
+        SlackModalFailurePayload payload = (SlackModalFailurePayload) responseCaptor.getValue();
+        assertThat(payload.getCode()).isEqualTo("CUSTOM_CODE");
+        assertThat(payload.getMessage()).isEqualTo("Custom message");
+        assertThat(payload.getError()).isEqualTo("invalid_trigger");
+    }
+
+    @Test
+    void openOrAckFallsBackToDefaultFailureInfoWhenNullProvided() throws Exception {
+        // Given
+        Context context = mock(Context.class);
+        MethodsClient methodsClient = mock(MethodsClient.class);
+        ViewsOpenResponse viewsOpenResponse = mock(ViewsOpenResponse.class);
+        Response ackWithJsonResponse = Response.builder().statusCode(200).body("ack-json").build();
+        ArgumentCaptor<Object> responseCaptor = ArgumentCaptor.forClass(Object.class);
+
+        when(context.client()).thenReturn(methodsClient);
+        when(methodsClient.viewsOpen(anyConfigurator())).thenReturn(viewsOpenResponse);
+        when(viewsOpenResponse.isOk()).thenReturn(false);
+        when(viewsOpenResponse.getError()).thenReturn("invalid_trigger");
+        when(context.ackWithJson(responseCaptor.capture())).thenReturn(ackWithJsonResponse);
+
+        // When
+        Response result = SlackModalOpener.openOrAck(
+                context,
+                "trigger-1",
+                View.builder().type("modal").build(),
+                null
+        );
+
+        // Then
+        assertThat(result).isSameAs(ackWithJsonResponse);
+        SlackModalFailurePayload payload = (SlackModalFailurePayload) responseCaptor.getValue();
+        assertThat(payload.getCode()).isEqualTo("SLACK_MODAL_OPEN_FAILED");
+        assertThat(payload.getMessage()).isEqualTo("Failed to open modal");
     }
 
     @SuppressWarnings("unchecked")
