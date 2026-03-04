@@ -57,7 +57,32 @@ slack:
 - SocketMode 시작/종료 라이프사이클 객체 분리
 - 설정 누락(bot/app token) 시 명확한 예외 메시지 제공
 
-## 6. View Submission 검증 응답 처리
+## 6. Modal Input 작성 추상화 (Phase 1)
+- 기존 `RequirementConfirmModalHandler`, `VocConfirmModalHandler`처럼 `input(...).blockId(...).actionId(...)`를 반복 작성하던 패턴을 DSL로 전환할 수 있습니다.
+- `ModalFieldKey`가 `block_id/action_id`를 자동 파생해 문자열 하드코딩과 오타 리스크를 줄입니다.
+
+```java
+ModalFieldKey<String> ownerKey = ModalFieldKey.singleSelect("owner");
+ModalFieldKey<?> dateKey = ModalFieldKey.date("target_date");
+ModalFieldKey<?> timeKey = ModalFieldKey.time("target_time");
+ModalFieldKey<String> agendaKey = ModalFieldKey.text("agenda");
+
+View view = SlackModalBuilder.modal("socket-mode-view-submit", "Sample Modal", "Submit", "Cancel")
+        .privateMetadata("source=global_shortcut")
+        .addStaticSelect(ownerKey, "Owner", "Select owner", ownerOptions, false)
+        .addDatePicker(dateKey, "Target date", "Pick a date", false)
+        .addTimePicker(timeKey, "Target time", "Pick a time", false)
+        .addTextInput(agendaKey, "Agenda", "Describe the agenda", false, true)
+        .build();
+
+return SlackModalOpener.openOrAck(ctx, req.getPayload().getTriggerId(), view);
+```
+
+- 현재 지원 타입: `plain_text_input`, `datepicker`, `timepicker`, `static_select`, `radio_buttons`
+- 패키지: `io.github.inshakr2.slackboltsocketmode.core.modal`
+- `SlackModalValidationException`은 modal DSL 검증 실패(`core.modal` 내부)에만 사용됩니다.
+
+## 7. View Submission 검증 응답 처리
 - `ViewSubmissionValidationErrors` 유틸을 사용해 block 단위 에러를 누적하고 `ackWithErrors`로 응답할 수 있습니다.
 
 ```java
