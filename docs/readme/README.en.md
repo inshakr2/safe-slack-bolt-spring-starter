@@ -311,41 +311,27 @@ Key difference: manual implementation keeps accumulating infra maintenance, whil
 - `AbstractMessageEventHandler`
 - `AbstractAppHomeOpenedEventHandler`
 
-## Experimental: Modal Input DSL (Phase 1)
+## What's New (v1.1.0)
 
-You can reduce repetitive `block_id`, `action_id`, and `input(...)` modal code with the shared DSL.
+- **Modal Input DSL added**: reduces repetitive `block_id`, `action_id`, and `input(...)` composition for faster modal development.
+  - Main APIs: [SlackModalBuilder](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalBuilder.java), [ModalFieldKey](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/ModalFieldKey.java), [ModalOption](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/ModalOption.java)
+- **Modal open/failure flow standardized**: simplifies success/failure branching and fallback response handling.
+  - Main APIs: [SlackModalOpener](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalOpener.java), [SlackModalOpenResult](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalOpenResult.java), [SlackModalFailureInfo](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalFailureInfo.java)
+- **Validation strengthened (Fail-Fast)**: blocks invalid modal definitions (blank values, constraint violations, duplicate identifiers) before runtime.
+  - Related class: [SlackModalValidationException](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalValidationException.java)
+
+You can see an end-to-end example in [SampleGlobalShortcutHandler](../../slack-bolt-socket-mode-sample/src/main/java/io/github/inshakr2/slackboltsocketmode/sample/handler/SampleGlobalShortcutHandler.java).
 
 ```java
-import io.github.inshakr2.slackboltsocketmode.core.modal.ModalFieldKey;
-import io.github.inshakr2.slackboltsocketmode.core.modal.ModalOption;
-import io.github.inshakr2.slackboltsocketmode.core.modal.SlackModalBuilder;
-import io.github.inshakr2.slackboltsocketmode.core.modal.SlackModalOpener;
-
-ModalFieldKey<String> ownerKey = ModalFieldKey.singleSelect("owner");
-ModalFieldKey<?> targetDateKey = ModalFieldKey.date("target_date");
-ModalFieldKey<?> targetTimeKey = ModalFieldKey.time("target_time");
-ModalFieldKey<String> agendaKey = ModalFieldKey.text("agenda");
-
-View view = SlackModalBuilder.modal("socket-mode-view-submit", "Sample Modal", "Submit", "Cancel")
-        .privateMetadata("source=global_shortcut")
-        .addHeader("Schedule a follow-up action")
-        .addStaticSelect(ownerKey, "Owner", "Select owner", List.of(
-                ModalOption.of("Operator A", "1001"),
-                ModalOption.of("Operator B", "1002")
-        ), false)
-        .addDatePicker(targetDateKey, "Target date", "Pick a date", false)
-        .addTimePicker(targetTimeKey, "Target time", "Pick a time", false)
-        .addTextInput(agendaKey, "Agenda", "Describe the agenda", false, true)
+View modal = SlackModalBuilder.modal("socket-mode-view-submit", "Sample Modal", "Submit", "Cancel")
+        .addStaticSelect(OWNER_KEY, "Owner", "Select owner", options, false)
+        .addDatePicker(TARGET_DATE_KEY, "Target date", "Pick a date", false)
         .build();
 
-return SlackModalOpener.openOrAck(ctx, req.getPayload().getTriggerId(), view);
+return SlackModalOpener.openOrAck(ctx, req.getPayload().getTriggerId(), modal);
 ```
 
-- `ModalFieldKey` derives `block_id/action_id` automatically.
-- `SlackModalBuilder` assembles callback/title/submit/close and input blocks in one place.
-- `SlackModalOpener.openOrAck(ctx, triggerId, view)` returns `ackWithJson` with a default failure payload when opening a modal fails.
-- `SlackModalValidationException` is used only for validation failures inside the `core.modal` package.
-- Currently supported input types: `plain_text_input`, `datepicker`, `timepicker`, `static_select`, `radio_buttons`
+> This section is overwritten with the latest changes on every version update.
 
 ## Safety features
 
