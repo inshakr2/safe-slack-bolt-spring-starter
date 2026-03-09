@@ -106,7 +106,7 @@ public final class SlackModalBuilder {
 
     /**
      * Appends a plain_text_input InputBlock into {@code blocks}.
-     * key.blockId -> block_id, key.actionId -> action_id.
+     * {@code key.blockId -> block_id, key.actionId -> action_id}.
      * label/placeholder/optional/multiline are mapped to the input element.
      */
     public SlackModalBuilder addTextInput(ModalFieldKey<String> key,
@@ -130,7 +130,7 @@ public final class SlackModalBuilder {
 
     /**
      * Appends a datepicker InputBlock into {@code blocks}.
-     * key.blockId -> block_id, key.actionId -> action_id.
+     * {@code key.blockId -> block_id, key.actionId -> action_id}.
      * label/placeholder/optional are mapped to the input element.
      */
     public SlackModalBuilder addDatePicker(ModalFieldKey<?> key,
@@ -152,7 +152,7 @@ public final class SlackModalBuilder {
 
     /**
      * Appends a timepicker InputBlock into {@code blocks}.
-     * key.blockId -> block_id, key.actionId -> action_id.
+     * {@code key.blockId -> block_id, key.actionId -> action_id}.
      * label/placeholder/optional are mapped to the input element.
      */
     public SlackModalBuilder addTimePicker(ModalFieldKey<?> key,
@@ -174,7 +174,7 @@ public final class SlackModalBuilder {
 
     /**
      * Appends a static_select InputBlock into {@code blocks}.
-     * key.blockId -> block_id, key.actionId -> action_id.
+     * {@code key.blockId -> block_id, key.actionId -> action_id}.
      * label/placeholder/options/optional are mapped to the input element.
      */
     public SlackModalBuilder addStaticSelect(ModalFieldKey<String> key,
@@ -198,7 +198,7 @@ public final class SlackModalBuilder {
 
     /**
      * Appends a radio_buttons InputBlock into {@code blocks}.
-     * key.blockId -> block_id, key.actionId -> action_id.
+     * {@code key.blockId -> block_id, key.actionId -> action_id}.
      * label/options/optional are mapped to the input element.
      */
     public SlackModalBuilder addRadioButtons(ModalFieldKey<String> key,
