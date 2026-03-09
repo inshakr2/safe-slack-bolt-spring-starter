@@ -311,6 +311,28 @@ Key difference: manual implementation keeps accumulating infra maintenance, whil
 - `AbstractMessageEventHandler`
 - `AbstractAppHomeOpenedEventHandler`
 
+## What's New (v1.1.0)
+
+- **Modal Input DSL added**: reduces repetitive `block_id`, `action_id`, and `input(...)` composition for faster modal development.
+  - Main APIs: [SlackModalBuilder](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalBuilder.java), [ModalFieldKey](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/ModalFieldKey.java), [ModalOption](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/ModalOption.java)
+- **Modal open/failure flow standardized**: simplifies success/failure branching and fallback response handling.
+  - Main APIs: [SlackModalOpener](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalOpener.java), [SlackModalOpenResult](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalOpenResult.java), [SlackModalFailureInfo](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalFailureInfo.java)
+- **Validation strengthened (Fail-Fast)**: blocks invalid modal definitions (blank values, constraint violations, duplicate identifiers) before runtime.
+  - Related class: [SlackModalValidationException](../../slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalValidationException.java)
+
+You can see an end-to-end example in [SampleGlobalShortcutHandler](../../slack-bolt-socket-mode-sample/src/main/java/io/github/inshakr2/slackboltsocketmode/sample/handler/SampleGlobalShortcutHandler.java).
+
+```java
+View modal = SlackModalBuilder.modal("socket-mode-view-submit", "Sample Modal", "Submit", "Cancel")
+        .addStaticSelect(OWNER_KEY, "Owner", "Select owner", options, false)
+        .addDatePicker(TARGET_DATE_KEY, "Target date", "Pick a date", false)
+        .build();
+
+return SlackModalOpener.openOrAck(ctx, req.getPayload().getTriggerId(), modal);
+```
+
+> This section is overwritten with the latest changes on every version update.
+
 ## Safety features
 
 - Common logging + `ctx.ack()` fallback on handler exceptions

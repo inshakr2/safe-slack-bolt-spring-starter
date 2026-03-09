@@ -45,13 +45,13 @@ public class TicketSubmitHandler extends AbstractViewSubmissionHandler {
 
 ---
 
-### 무엇이 좋아지나?
+### 왜 써야 하나요?
 - Slack Bolt 핸들러 등록을 자동화해서 비즈니스 로직 구현에 집중할 수 있습니다.
 - 핸들러 예외 발생 시 공통 로깅 + `ctx.ack()` fallback으로 응답 안정성을 높입니다.
 - 핸들러 식별자(identifier) 중복을 앱 시작 시 Fail-Fast로 차단합니다.
 - `action_id` / `callback_id` / `command`만 정확히 정의하면 바로 동작합니다.
 
-### 왜 편한가? (직접 구현 대비)
+### 직접 구현 대비 편의성
 
 | 항목 | 직접 구현 시 | Starter 사용 시 |
 |---|---|---|
@@ -61,7 +61,7 @@ public class TicketSubmitHandler extends AbstractViewSubmissionHandler {
 | Socket Mode 시작/종료 | 수명주기 직접 관리 | 자동 구성/자동 시작 옵션 |
 | 구현 집중 포인트 | 인프라 코드 + 비즈니스 코드 혼재 | `handle()` 비즈니스 로직 중심 |
 
-## 3분 사용법
+## 빠른 시작
 
 ### 1) 의존성 추가
 
@@ -311,17 +311,28 @@ public class HelloCommandHandler extends AbstractCommandHandler {
 - `AbstractMessageEventHandler`
 - `AbstractAppHomeOpenedEventHandler`
 
-## 안전 장치
+## What's New (v1.1.0)
 
+- **Modal Input DSL 추가**: 반복적인 `block_id`, `action_id`, `input(...)` 조립 코드를 줄여 모달 작성 속도를 높였습니다.
+  - 주요 API: [SlackModalBuilder](./slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalBuilder.java), [ModalFieldKey](./slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/ModalFieldKey.java), [ModalOption](./slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/ModalOption.java)
+- **모달 오픈/실패 처리 표준화**: 성공/실패 분기와 fallback 응답 처리 흐름을 단순화했습니다.
+  - 주요 API: [SlackModalOpener](./slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalOpener.java), [SlackModalOpenResult](./slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalOpenResult.java), [SlackModalFailureInfo](./slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalFailureInfo.java)
+- **검증 강화(Fail-Fast)**: 잘못된 모달 정의(빈 값/제약 위반/중복 식별자)를 실행 전에 차단하도록 강화했습니다.
+  - 관련 클래스: [SlackModalValidationException](./slack-bolt-socket-mode-core/src/main/java/io/github/inshakr2/slackboltsocketmode/core/modal/SlackModalValidationException.java)
+
+예시 코드는 [SampleGlobalShortcutHandler](./slack-bolt-socket-mode-sample/src/main/java/io/github/inshakr2/slackboltsocketmode/sample/handler/SampleGlobalShortcutHandler.java)에서 확인할 수 있습니다.
+
+```java
+View modal = SlackModalBuilder.modal("socket-mode-view-submit", "Sample Modal", "Submit", "Cancel")
+        .addStaticSelect(OWNER_KEY, "Owner", "Select owner", options, false)
+        .addDatePicker(TARGET_DATE_KEY, "Target date", "Pick a date", false)
+        .build();
+
+return SlackModalOpener.openOrAck(ctx, req.getPayload().getTriggerId(), modal);
+```
+## 예외 대응 및 보호 기능
 - 핸들러 실행 예외 시 공통 로깅 후 `ctx.ack()` fallback
 - 핸들러 식별자 중복 시 앱 시작 단계에서 즉시 실패(Fail-Fast)
-
-## 로컬 검증
-
-```bash
-./gradlew clean test
-./gradlew publishToMavenLocal -Psigning.skip=true
-```
 
 ## 모듈
 
